@@ -182,43 +182,7 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
           )}
           {t(Strings.template_centre)}
         </div>
-        {/* <div className={styles.searchContainer}>
-          <SearchInput
-            className={styles.templateSearch}
-            keyword={keywords}
-            change={setKeywords}
-            size="small"
-            onBlur={() => bindSearchQuery(keywords)}
-            onKeyDown={onSearchInputKeyDown}
-            suffix={
-              keywords && (
-                <span onClick={clearKeyword}>
-                  <CloseCircleFilled className={styles.closeBtn} />
-                </span>
-              )
-            }
-          />
-        </div> */}
         <div className={styles.listContainer}>
-          {/* <div className={styles.officialTemplate}>
-            <Typography className={classNames(styles.subTitle, styles.officialSubTitle)} variant="h6">
-              {t(Strings.official_template)}
-            </Typography>
-            <div className={styles.officialTemplateList}>
-              {categoryList.map((category, index) => (
-                <div
-                  key={index}
-                  className={classNames(styles.categoryItem, {
-                    [styles.active]: category.categoryCode === categoryId || (!categoryId && index === 0),
-                    [styles.activedCategoryMobile]: isMobile,
-                  })}
-                  onClick={() => handleClick(category.categoryCode)}
-                >
-                  <div className={classNames(styles.categoryName)}>{category.categoryName}</div>
-                </div>
-              ))}
-            </div>
-          </div> */}
           {spaceId && (
             <div className={styles.spaceTemplate}>
               <Typography variant="h6" className={styles.subTitle}>
@@ -236,51 +200,6 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
               </div>
             </div>
           )}
-          {/* {keywords && (
-            <div className={styles.searchResult}>
-              {(templates && templates.length > 0) || (albums && albums.length > 0) ? (
-                <>
-                  {templates && templates.length > 0 && (
-                    <>
-                      <h3>{t(Strings.template)}</h3>
-                      {templates.map((item) => (
-                        <div
-                          className={styles.item}
-                          key={item.templateId}
-                          onClick={() => jumpTemplate(item.categoryCode || ConfigConstant.TEMPLATE_UNCATEGORIZED, item.templateId)}
-                        >
-                          <Typography className={styles.nameContainer} variant="body2">
-                            <TemplateIcon width={16} height={16} fill={colors.staticWhite0} />
-                            <span className={styles.name} dangerouslySetInnerHTML={{ __html: item.templateName }} />
-                          </Typography>
-                          <Typography className={styles.tags} variant="body3">
-                            {item.tags.map((tag, index) => (
-                              <span key={index} className={styles.tag} dangerouslySetInnerHTML={{ __html: tag }} />
-                            ))}
-                          </Typography>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                  {albums && albums.length > 0 && (
-                    <>
-                      <h3>{t(Strings.album)}</h3>
-                      {albums?.map((item, index) => (
-                        <div className={styles.albumName} onClick={() => openTemplateAlbumDetail(item.albumId)} key={index}>
-                          <span dangerouslySetInnerHTML={{ __html: item.name }} />
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className={styles.emptyList}>
-                  <Image src={SearchDefaultPng} alt="empty" />
-                  <div className={styles.tip}>{t(Strings.no_search_result)}</div>
-                </div>
-              )}
-            </div>
-          )} */}
         </div>
       </div>
     </div>

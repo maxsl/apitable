@@ -32,12 +32,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 public class BillingContextConfig {
 
-    // @Bean
-    // @ConditionalOnMissingBean
-    // public EntitlementServiceFacade defaultEntitlementServiceFacade() {
-    //     return new DefaultEntitlementServiceFacadeImpl();
-    // }
-
     @Bean
     @ConditionalOnMissingBean
     public EntitlementServiceFacade maxslEntitlementServiceFacade() {
