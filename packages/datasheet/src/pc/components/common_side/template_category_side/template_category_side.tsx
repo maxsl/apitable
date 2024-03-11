@@ -182,7 +182,7 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
           )}
           {t(Strings.template_centre)}
         </div>
-        <div className={styles.searchContainer}>
+        {/* <div className={styles.searchContainer}>
           <SearchInput
             className={styles.templateSearch}
             keyword={keywords}
@@ -198,9 +198,9 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
               )
             }
           />
-        </div>
+        </div> */}
         <div className={styles.listContainer}>
-          <div className={styles.officialTemplate}>
+          {/* <div className={styles.officialTemplate}>
             <Typography className={classNames(styles.subTitle, styles.officialSubTitle)} variant="h6">
               {t(Strings.official_template)}
             </Typography>
@@ -218,7 +218,7 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
           {spaceId && (
             <div className={styles.spaceTemplate}>
               <Typography variant="h6" className={styles.subTitle}>
@@ -236,7 +236,7 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
               </div>
             </div>
           )}
-          {keywords && (
+          {/* {keywords && (
             <div className={styles.searchResult}>
               {(templates && templates.length > 0) || (albums && albums.length > 0) ? (
                 <>
@@ -280,7 +280,7 @@ export const TemplateCategorySide: FC<React.PropsWithChildren<unknown>> = () => 
                 </div>
               )}
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

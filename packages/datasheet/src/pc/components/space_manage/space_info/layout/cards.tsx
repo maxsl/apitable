@@ -17,7 +17,7 @@
  */
 import { useMemo } from 'react';
 import { Strings, t } from '@apitable/core';
-import { CreditCostCard } from 'pc/components/space_manage/space_info/components/credit_cost_card/credit_cost_card';
+// import { CreditCostCard } from 'pc/components/space_manage/space_info/components/credit_cost_card/credit_cost_card';
 import { useAutomation } from 'pc/components/space_manage/space_info/hooks/use_automation';
 import { useCredit } from 'pc/components/space_manage/space_info/hooks/use_credit';
 import { getEnvVariables, isMobileApp } from 'pc/utils/env';
@@ -243,27 +243,27 @@ export const useCards = (props: ILayoutProps) => {
           lines={othersData}
         />
       ),
-      CreditCostCard: (props: ICardProps) => (
-        <CreditCostCard
-          {...props}
-          title={t(Strings.ai_message_credit_title)}
-          titleTip={t(Strings.ai_credit_cost_chart_tooltip)}
-          strokeColor={strokeColor}
-        />
-      ),
-      CreditCard: (props: ICardProps) => (
-        <Card
-          {...props}
-          {...creditData}
-          isMobile={isMobile}
-          shape="circle"
-          unit={t(Strings.ai_credit_pointer)}
-          trailColor={trailColor}
-          strokeColor={strokeColor}
-          title={t(Strings.ai_credit_cost_chart_title)}
-          titleTip={t(Strings.ai_credit_usage_tooltip)}
-        />
-      ),
+      // CreditCostCard: (props: ICardProps) => (
+      //   <CreditCostCard
+      //     {...props}
+      //     title={t(Strings.ai_message_credit_title)}
+      //     titleTip={t(Strings.ai_credit_cost_chart_tooltip)}
+      //     strokeColor={strokeColor}
+      //   />
+      // ),
+      // CreditCard: (props: ICardProps) => (
+      //   <Card
+      //     {...props}
+      //     {...creditData}
+      //     isMobile={isMobile}
+      //     shape="circle"
+      //     unit={t(Strings.ai_credit_pointer)}
+      //     trailColor={trailColor}
+      //     strokeColor={strokeColor}
+      //     title={t(Strings.ai_credit_cost_chart_title)}
+      //     titleTip={t(Strings.ai_credit_usage_tooltip)}
+      //   />
+      // ),
     };
     // eslint-disable-next-line
   }, [handleDelSpace, level, spaceInfo, subscription, onUpgrade]);

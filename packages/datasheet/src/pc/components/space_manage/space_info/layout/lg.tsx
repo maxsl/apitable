@@ -36,8 +36,8 @@ export const Lg = (props: ILayoutProps) => {
     OthersCard,
     InfoCard,
     LevelCard,
-    CreditCard,
-    CreditCostCard,
+    // CreditCard,
+    // CreditCostCard,
   } = useCards(props);
 
   return (
@@ -46,9 +46,9 @@ export const Lg = (props: ILayoutProps) => {
         <Block flex={43}>
           <InfoCard minHeight={494} />
         </Block>
-        <Block flex={57}>
+        {/* <Block flex={57}>
           <CreditCard minHeight={372} />
-        </Block>
+        </Block> */}
         <Block flex={27}>
           <AutomationCard minHeight={372} />
         </Block>
@@ -78,9 +78,9 @@ export const Lg = (props: ILayoutProps) => {
             <RecordCard />
           </Block>
         </Block>
-        <Block flex={16}>
+        {/* <Block flex={16}>
           <CreditCostCard minHeight={372} />
-        </Block>
+        </Block> */}
         <Block flex={16} isWrap>
           <Block flex={16}>
             <ApiCard minHeight={372} />

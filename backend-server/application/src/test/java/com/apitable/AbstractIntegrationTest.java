@@ -426,6 +426,26 @@ public abstract class AbstractIntegrationTest extends TestSuiteWithDB {
             NodeEntity.builder()
                 .spaceId(spaceId).parentId("L1").nodeId("L2-5")
                 .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-5")
+                .build(),
+            NodeEntity.builder()
+                .spaceId(spaceId).parentId("L1").nodeId("L2-6")
+                .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-6")
+                .build(),
+            NodeEntity.builder()
+                .spaceId(spaceId).parentId("L1").nodeId("L2-7")
+                .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-7")
+                .build(),
+            NodeEntity.builder()
+                .spaceId(spaceId).parentId("L1").nodeId("L2-8")
+                .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-8")
+                .build(),
+            NodeEntity.builder()
+                .spaceId(spaceId).parentId("L1").nodeId("L2-9")
+                .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-9")
+                .build(),
+            NodeEntity.builder()
+                .spaceId(spaceId).parentId("L1").nodeId("L2-10")
+                .type(NodeType.DATASHEET.getNodeType()).nodeName("L2-10")
                 .build()
         );
         iNodeService.saveBatch(nodeEntities);

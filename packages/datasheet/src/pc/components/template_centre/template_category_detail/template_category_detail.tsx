@@ -92,12 +92,12 @@ export const TemplateCategoryDetail: FC<React.PropsWithChildren<ITemplateCategor
   const templateEmptyPng = themeName === ThemeName.Light ? NotDataImgLight : NotDataImgDark;
   useEffect(() => {
     // Login status is required to access the space station template
-    if (categoryId === 'tpcprivate' && user) {
-      setIsOfficial(false);
-      getTemplateList(spaceId, '', true);
-      !user.isMainAdmin && dispatch(StoreActions.spaceResource());
-      return;
-    }
+    // if (categoryId === 'tpcprivate' && user) {
+    //   setIsOfficial(false);
+    //   getTemplateList(spaceId, '', true);
+    //   !user.isMainAdmin && dispatch(StoreActions.spaceResource());
+    //   return;
+    // }
 
     setIsOfficial(true);
     getTemplateCategories(categoryId);

@@ -36,8 +36,8 @@ export const Sm = (props: ILayoutProps) => {
     OthersCard,
     InfoCard,
     LevelCard,
-    CreditCard,
-    CreditCostCard,
+    // CreditCard,
+    // CreditCostCard,
   } = useCards(props);
 
   return (
@@ -49,9 +49,9 @@ export const Sm = (props: ILayoutProps) => {
         <Block flex={27}>
           <CapacityCard />
         </Block>
-        <Block flex={27}>
+        {/* <Block flex={27}>
           <CreditCard minHeight={372} />
-        </Block>
+        </Block> */}
         <Block flex={27}>
           <RecordCard />
         </Block>
@@ -72,9 +72,9 @@ export const Sm = (props: ILayoutProps) => {
         <Block flex={27}>
           <FileCard />
         </Block>
-        <Block flex={27}>
+        {/* <Block flex={27}>
           <CreditCostCard minHeight={372} />
-        </Block>
+        </Block> */}
         <Block flex={27}>
           <ApiCard />
         </Block>

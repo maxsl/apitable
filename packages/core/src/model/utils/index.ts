@@ -275,7 +275,7 @@ export const getApiMetaUserProperty = (uuids: (string | {} | null)[], userMap?: 
 };
 
 export const getMaxManageableSpaceCount = () => {
-  return getCustomConfig().MAXIMUM_MANAGEABLE_SPACE_COUNT_PER_USER || 10;
+  return getCustomConfig().MAXIMUM_MANAGEABLE_SPACE_COUNT_PER_USER || 200;
 };
 
 export const getMaxFieldCountPerSheet = () => {
