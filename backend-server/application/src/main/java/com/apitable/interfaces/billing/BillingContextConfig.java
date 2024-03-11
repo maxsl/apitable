@@ -18,7 +18,6 @@
 
 package com.apitable.interfaces.billing;
 
-import com.apitable.interfaces.billing.facade.DefaultEntitlementServiceFacadeImpl;
 import com.apitable.interfaces.billing.facade.EntitlementServiceFacade;
 import com.apitable.interfaces.billing.facade.MaxslEntitlementServiceFacadeImpl;
 
@@ -31,7 +30,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 public class BillingContextConfig {
-
     @Bean
     @ConditionalOnMissingBean
     public EntitlementServiceFacade maxslEntitlementServiceFacade() {
