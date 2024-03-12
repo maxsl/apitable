@@ -82,6 +82,6 @@ target "all-in-one" {
     SEMVER_FULL = SEMVER_FULL
     IMAGE_TAG = IMAGE_TAG
   }
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   tags = ["${IMAGE_REGISTRY}/maxsl2688/all-in-one:latest", "${IMAGE_REGISTRY}/maxsl2688/all-in-one:${IMAGE_TAG}"]
 }
