@@ -22,14 +22,15 @@ import * as React from 'react';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button, useThemeColors } from '@apitable/components';
-import { Api, IReduxState, IUnitValue, Navigation, StoreActions, Strings, t } from '@apitable/core';
+import { Api, ConfigConstant, IReduxState, IUnitValue, Navigation, StoreActions, Strings, t } from '@apitable/core';
 import { EditOutlined } from '@apitable/icons';
-import { Avatar, AvatarSize, ButtonBase, Emoji, ImageCropUpload, ISelectInfo, IUploadType, Wrapper } from 'pc/components/common';
+import { Avatar, AvatarSize, ButtonBase, ImageCropUpload, ISelectInfo, IUploadType, Wrapper } from 'pc/components/common';
 import { Router } from 'pc/components/route_manager/router';
 import { useRequest, useUserRequest } from 'pc/hooks';
 import { useAppSelector } from 'pc/store/react-redux';
 import { isLocalSite } from 'pc/utils';
 import { useQuery } from '../../hooks/use_home';
+import { getNodeIcon } from '../catalog/tree/node_icon';
 import { defaultAvatars } from '../navigation/account_center_modal/basic_setting/default_avatar';
 import styles from './style.module.less';
 
@@ -228,7 +229,10 @@ const SettingNickname: FC<React.PropsWithChildren<unknown>> = () => {
           <div className={styles.errorMsg}>{error ? error.msg : ''}</div>
           <Button className={styles.submit} onClick={handleSubmit} color="primary" size="large" block>
             <div className={styles.button}>
-              <Emoji emoji="airplane" size={18} set="apple" />
+              {getNodeIcon('airplane', ConfigConstant.NodeType.DATASHEET, {
+                size: 18,
+                emojiSize: 18,
+              })}
               {t(Strings.button_come_on)}
             </div>
           </Button>

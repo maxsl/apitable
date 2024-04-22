@@ -144,6 +144,7 @@ export const CellLookUpBase: React.FC<React.PropsWithChildren<ICellLookUpProps>>
         />
       );
     case FieldType.Link:
+    case FieldType.OneWayLink:
       return (
         <CellLink
           className={className}

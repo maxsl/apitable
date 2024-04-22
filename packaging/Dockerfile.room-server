@@ -5,6 +5,7 @@ WORKDIR /app
 
 # install packages can use cache
 COPY ./pnpm-workspace.yaml ./package.json ./pnpm-lock.yaml ./common-tsconfig.json ./
+COPY ./patches/ ./patches
 
 COPY packages/i18n-lang/package.json ./packages/i18n-lang/
 
@@ -23,6 +24,7 @@ FROM apitable/node:v16.15.0 AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/patches ./patches
 COPY --from=deps /app/packages/i18n-lang/node_modules ./packages/i18n-lang/node_modules
 COPY --from=deps /app/packages/core/node_modules ./packages/core/node_modules
 COPY --from=deps /app/packages/room-server/node_modules ./packages/room-server/node_modules

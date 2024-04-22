@@ -484,4 +484,14 @@ public class WidgetServiceImpl implements IWidgetService {
             }
         }
     }
+
+    @Override
+    public List<String> getWidgetNodeIds(List<String> widgetIds) {
+        return widgetMapper.selectNodeIdsByWidgetIds(widgetIds);
+    }
+
+    @Override
+    public List<String> getNodeWidgetIds(List<String> nodeIds) {
+        return datasheetWidgetMapper.selectWidgetIdByDstIds(nodeIds);
+    }
 }

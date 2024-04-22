@@ -32,8 +32,9 @@ import classNames from 'classnames';
 import { configResponsive, useResponsive } from 'ahooks';
 import { useTouch, Direction } from '../../hooks/use-touch';
 import format from 'date-fns/format';
+import { isValid } from 'date-fns';
 
-export const Calendar:FC<React.PropsWithChildren<ICalendar>> = props => {
+export const Calendar: FC<React.PropsWithChildren<ICalendar>> = (props) => {
   const { defaultDate, monthPicker, ...rest } = props;
   configResponsive({
     middle: 768,
@@ -41,19 +42,16 @@ export const Calendar:FC<React.PropsWithChildren<ICalendar>> = props => {
   const responsive = useResponsive();
   const isMobile = !responsive.middle;
   const [step, setStep] = useState(0);
-  const defaultDate2Month = defaultDate && format(defaultDate, FORMAT_MONTH);
+  const defaultDate2Month = defaultDate && isValid(defaultDate) ? format(defaultDate, FORMAT_MONTH) : '';
   // Update of annual and monthly changes
   useEffect(() => {
     if (defaultDate2Month) {
-      const currStep = differenceInMonths(date2Month(defaultDate), date2Month(new Date()));
+      const currStep = differenceInMonths(date2Month(defaultDate!), date2Month(new Date()));
       setStep(currStep);
     }
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [defaultDate2Month]);
-  const { year, month } = useMemo(() =>
-    getPanelData(step),
-  [step]
-  );
+  const { year, month } = useMemo(() => getPanelData(step), [step]);
 
   const touch = useTouch();
   const [isChangeMonth, setChangeMonth] = useState(false);
@@ -74,13 +72,21 @@ export const Calendar:FC<React.PropsWithChildren<ICalendar>> = props => {
     <CalendarDiv className={classNames('calendar', { mobile: isMobile })}>
       <HeaderDiv className="calendar-header">
         <HeaderLeftDiv>
-          {isMobile ? <PreMonth /> : <Tooltip content={t(Strings.calendar_const_month_toggle_pre)}>
+          {isMobile ? (
             <PreMonth />
-          </Tooltip>}
+          ) : (
+            <Tooltip content={t(Strings.calendar_const_month_toggle_pre)}>
+              <PreMonth />
+            </Tooltip>
+          )}
           {monthPicker ? monthPicker(formatDate(year, month, lang)) : <span className="date">{formatDate(year, month, lang)}</span>}
-          {isMobile ? <NextMonth /> : <Tooltip content={t(Strings.calendar_const_month_toggle_next)}>
+          {isMobile ? (
             <NextMonth />
-          </Tooltip> }
+          ) : (
+            <Tooltip content={t(Strings.calendar_const_month_toggle_next)}>
+              <NextMonth />
+            </Tooltip>
+          )}
         </HeaderLeftDiv>
         <Button disabled={step === 0} color="primary" size="small" onClick={() => setStep(0)}>
           {t(Strings.calendar_const_today)}
@@ -88,7 +94,9 @@ export const Calendar:FC<React.PropsWithChildren<ICalendar>> = props => {
       </HeaderDiv>
       <div className="weeks">
         {weeks.map((week, idx) => (
-          <WeekDiv key={week} className={classNames({ wk: [5, 6].includes(idx) })}>{week}</WeekDiv>
+          <WeekDiv key={week} className={classNames({ wk: [5, 6].includes(idx) })}>
+            {week}
+          </WeekDiv>
         ))}
       </div>
       {isMobile ? (
@@ -113,12 +121,10 @@ export const Calendar:FC<React.PropsWithChildren<ICalendar>> = props => {
         >
           <Month step={step} isMobile={isMobile} {...rest} />
         </div>
-      ) : <Month step={step} isMobile={isMobile} {...rest} />}
-      {isChangeMonth && (
-        <div className="change-month">
-          {t(Strings.calendar_const_touch_tip)}
-        </div>
+      ) : (
+        <Month step={step} isMobile={isMobile} {...rest} />
       )}
+      {isChangeMonth && <div className="change-month">{t(Strings.calendar_const_touch_tip)}</div>}
     </CalendarDiv>
   );
 };

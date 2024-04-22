@@ -20,6 +20,7 @@ package com.apitable.automation.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.apitable.automation.model.ActionVO;
+import com.apitable.automation.model.AutomationRunTaskVO;
 import com.apitable.automation.model.AutomationSimpleVO;
 import com.apitable.automation.model.AutomationTaskSimpleVO;
 import com.apitable.automation.model.AutomationVO;
@@ -47,6 +48,7 @@ import com.apitable.workspace.enums.PermissionException;
 import com.apitable.workspace.mapper.NodeDescMapper;
 import com.apitable.workspace.ro.NodeUpdateOpRo;
 import com.apitable.workspace.service.INodeService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -215,13 +217,29 @@ public class AutomationRobotController {
     }
 
     /**
-     * Get automation run history.
+     * Get automation run history detail.
      *
-     * @param pageSize   page query parameter
-     * @param pageNum    page query parameter
+     * @param taskId task id
+     * @return {@link ResponseData}
+     */
+    @GetResource(path = "/run-history/{taskId}", requiredPermission = false, requiredLogin = false)
+    @Parameter(name = "taskId", description = "task id", required = true, schema = @Schema(type = "string"), in = ParameterIn.PATH, example = "123****")
+    @Operation(summary = "Get automation run history task details")
+    @ApiResponses(@ApiResponse(responseCode = "200", useReturnTypeSchema = true))
+    public ResponseData<AutomationRunTaskVO> getRunHistoryTaskDetail(
+        @PathVariable String taskId) {
+        return ResponseData.success(iAutomationRunHistoryService.getByTaskDetail(taskId));
+    }
+
+    /**
+     * get automation run history.
+     *
+     * @param pageSize   page size of automation run history
+     * @param pageNum    page number
+     * @param shareId    share id
      * @param resourceId resource id
      * @param robotId    robot id
-     * @return {@link ResponseData}
+     * @return response
      */
     @GetResource(path = "/{resourceId}/roots/{robotId}/run-history", requiredPermission = false, requiredLogin = false)
     @Parameters({
@@ -243,8 +261,10 @@ public class AutomationRobotController {
         iPermissionService.checkPermissionBySessionOrShare(resourceId, shareId,
             NodePermission.READ_NODE,
             status -> ExceptionUtil.isTrue(status, PermissionException.NODE_OPERATION_DENIED));
+        String spaceId = iNodeService.getSpaceIdByNodeId(resourceId);
+        Page<Void> page = Page.of(pageNum, pageSize);
         return ResponseData.success(
-            iAutomationRunHistoryService.getRobotRunHistory(robotId, pageSize, pageNum));
+            iAutomationRunHistoryService.getRobotRunHistory(spaceId, robotId, page));
     }
 
     /**
@@ -328,7 +348,7 @@ public class AutomationRobotController {
         iPermissionService.checkPermissionBySessionOrShare(resourceId, null,
             NodePermission.EDIT_NODE,
             status -> ExceptionUtil.isTrue(status, PermissionException.NODE_OPERATION_DENIED));
-        iAutomationTriggerService.deleteByDatabus(robotId, triggerId, userId);
+        iAutomationTriggerService.deleteByTriggerId(robotId, triggerId, userId);
         return ResponseData.success();
     }
 

@@ -154,4 +154,12 @@ public interface IAutomationRobotService {
      * @param robotId robot id
      */
     void checkRobotExists(String robotId);
+
+    /**
+     * get robot count.
+     *
+     * @param nodeIds dst id
+     * @return count
+     */
+    boolean linkByOutsideAutomation(List<String> nodeIds);
 }

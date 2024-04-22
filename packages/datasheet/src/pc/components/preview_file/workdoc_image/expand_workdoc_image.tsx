@@ -8,6 +8,7 @@ import { WorkdocImage } from './workdoc_image';
 interface IExpandWorkdocImage {
   file: any;
   onDelete: () => void;
+  isEditable: boolean;
 }
 
 export const expandWorkdocImage = (props: IExpandWorkdocImage) => {

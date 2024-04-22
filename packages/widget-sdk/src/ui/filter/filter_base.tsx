@@ -27,9 +27,9 @@ import { IWidgetState } from 'interface';
 const transformNullFilter = (filter?: IExpression) => {
   return filter == null || isEqual(filter, EmptyNullOperand)
     ? {
-        operator: OperatorEnums.And,
-        operands: [],
-      }
+      operator: OperatorEnums.And,
+      operands: [],
+    }
     : filter;
 };
 interface IFilterProps {
@@ -211,7 +211,7 @@ export const FilterBase = (props: IFilterProps) => {
             return (
               <React.Fragment key={path}>
                 {index == 0 ? (
-                  <OperatorWrap>{t(Strings.where)}</OperatorWrap>
+                  <OperatorWrap>{t(Strings.when)}</OperatorWrap>
                 ) : index === 1 ? (
                   <Select
                     dropDownOptions={{

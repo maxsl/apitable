@@ -58,4 +58,11 @@ public interface AutomationActionMapper extends BaseMapper<AutomationActionEntit
                                             String updatedActionTypeId,
                                             @Param("updatedInput") String updatedInput);
 
+    /**
+     * query by action id.
+     *
+     * @param actionId action id
+     * @return AutomationActionEntity
+     */
+    AutomationActionEntity selectByActionId(@Param("actionId") String actionId);
 }

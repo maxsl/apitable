@@ -206,7 +206,7 @@ export const getRobotTrigger = (url: string): Promise<IRobotTrigger | undefined>
 };
 
 export const getAutomationRunHistoryDetail = (taskId: string): Promise<IRobotHistoryTask | undefined> => {
-  return nestReq.get(`/automation/run-history/${taskId}`).then((res) => {
+  return axios.get(`/automation/run-history/${taskId}`).then((res) => {
     const taskDetail: undefined | IRobotHistoryTask = res?.data?.data;
     return taskDetail;
   });

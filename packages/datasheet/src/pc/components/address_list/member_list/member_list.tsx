@@ -20,7 +20,7 @@ import { useThrottleFn } from 'ahooks';
 import { List } from 'antd';
 import VirtualList from 'rc-virtual-list';
 import { FC, useState, useEffect } from 'react';
-import { Loading } from '@apitable/components';
+import { Loading, TextButton } from '@apitable/components';
 import { IMemberInfoInAddressList, Navigation, StoreActions, Strings, t, ConfigConstant } from '@apitable/core';
 import { InfoCard } from 'pc/components/common';
 import { ScreenSize } from 'pc/components/common/component_display/enum';
@@ -82,25 +82,27 @@ export const MemberList: FC<React.PropsWithChildren<IMemberList>> = (props) => {
 
   const { run: loadData } = useThrottleFn(() => handleScroll(), { wait: 500 });
 
-  const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-    const pages = Math.ceil(memberListTotal / ConfigConstant.MEMBER_LIST_PAGE_SIZE);
-    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === listHeight && memberListPageNo < pages) {
-      loadData();
-    }
-  };
+  const hasMore = memberListPageNo < Math.ceil(memberListTotal / ConfigConstant.MEMBER_LIST_PAGE_SIZE);
 
   return (
     <div className={styles.memberListContainer}>
       <List itemLayout="horizontal">
         <VirtualList
-          data={memberList}
+          data={hasMore && !memberListLoading ? [...memberList, 'end'] : memberList}
           itemKey="memberId"
           height={listHeight}
           itemHeight={70}
-          onScroll={onScroll}
           className={styles.memberListWrapper}
         >
-          {(item) => {
+          {(_item) => {
+            if (_item === 'end') {
+              return (
+                <TextButton onClick={() => loadData()} color="primary">
+                  {t(Strings.click_load_more)}
+                </TextButton>
+              );
+            }
+            const item = _item as IMemberInfoInAddressList;
             const { memberId, memberName, email, avatar, isActive, isMemberNameModified, avatarColor, nickName } = item;
             const title =
               getSocialWecomUnitName?.({
@@ -148,7 +150,6 @@ export const MemberList: FC<React.PropsWithChildren<IMemberList>> = (props) => {
             );
           }}
         </VirtualList>
-        {/* <div className={styles.lodaing} > <Loading /> </div> */}
       </List>
       {memberListLoading && (
         <div className={styles.lodingWrapper}>

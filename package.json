@@ -67,7 +67,6 @@
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "eslint-config-prettier": "^8",
-    "git-format-staged": "^3.0.0",
     "@babel/core": "7.22.20",
     "@commitlint/cli": "17.7.1",
     "@commitlint/config-conventional": "17.7.0",
@@ -94,6 +93,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-vika": "0.0.1",
+    "git-format-staged": "^3.0.0",
     "husky": "8.0.3",
     "lint-staged": "14.0.1",
     "lodash": "^4.17.21",
@@ -103,8 +103,8 @@
     "quicktype": "^23.0.75",
     "svgo": "^3.0.2",
     "ts-node": "^10.9.1",
-    "typescript": "4.8.2",
-    "ts-pnp": "1.2.0"
+    "ts-pnp": "1.2.0",
+    "typescript": "4.8.2"
   },
   "resolutions": {
     "node-gyp": "9.3.1",
@@ -132,6 +132,9 @@
           "node-gyp": "*"
         }
       }
+    },
+    "patchedDependencies": {
+      "mysql2@2.3.3": "patches/mysql2@2.3.3.patch"
     }
   },
   "dependencies": {

@@ -20,8 +20,7 @@ import classNames from 'classnames';
 import { forwardRef, memo, useImperativeHandle, useRef, useState } from 'react';
 import * as React from 'react';
 import { ConfigConstant, Field } from '@apitable/core';
-
-import { Emoji } from 'pc/components/common';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
 import { stopPropagation } from 'pc/utils/dom';
 import { KeyCode } from 'pc/utils/keycode';
 import { FocusHolder } from '../focus_holder';
@@ -119,7 +118,10 @@ const CheckboxEditorBase: React.ForwardRefRenderFunction<IEditor, ICheckboxEdito
     <div className={styles.checkboxBase} style={style} onMouseDown={() => handleChange()} onMouseMove={stopPropagation} onKeyDown={handleKeyDown}>
       <FocusHolder ref={editorRef} />
       <span className={classNames({ [styles.unChecked]: !value, [styles.iconContainer]: true })}>
-        <Emoji emoji={icon} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />
+        {getNodeIcon(icon, ConfigConstant.NodeType.DATASHEET, {
+          size: ConfigConstant.CELL_EMOJI_SIZE,
+          emojiSize: ConfigConstant.CELL_EMOJI_SIZE,
+        })}
       </span>
     </div>
   );

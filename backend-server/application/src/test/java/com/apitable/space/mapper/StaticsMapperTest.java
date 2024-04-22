@@ -20,6 +20,7 @@ package com.apitable.space.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import cn.hutool.json.JSONUtil;
 import com.apitable.AbstractMyBatisMapperTest;
 import com.apitable.space.dto.NodeStaticsDTO;
 import com.apitable.space.dto.NodeTypeStaticsDTO;
@@ -68,8 +69,8 @@ public class StaticsMapperTest extends AbstractMyBatisMapperTest {
     @Test
     @Sql({"/sql/datasheet-meta-data.sql", "/sql/datasheet-data.sql"})
     void testCountRecordsBySpaceId() {
-        Long count = staticsMapper.countRecordsBySpaceId("spc41");
-        assertThat(count).isEqualTo(3);
+        List<String> count = staticsMapper.countRecordsBySpaceId("spc41");
+        assertThat(3).isEqualTo(JSONUtil.parseArray(count.get(0)).size());
     }
 
     @Test

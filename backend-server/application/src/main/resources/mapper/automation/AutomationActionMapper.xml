@@ -52,4 +52,10 @@
             `input`        = #{updatedInput}
         WHERE robot_id = #{robotId}
     </update>
+
+    <select id="selectByActionId" resultType="com.apitable.automation.entity.AutomationActionEntity">
+        SELECT * FROM ${tablePrefix}automation_action
+        WHERE action_id = #{actionId}
+        AND is_deleted = 0
+    </select>
 </mapper>

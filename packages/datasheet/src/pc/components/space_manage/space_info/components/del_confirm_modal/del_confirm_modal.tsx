@@ -91,6 +91,7 @@ export const DelConfirmModal: FC<React.PropsWithChildren<IDelConfirmModalProps>>
             <li>{t(Strings.attachment_data)}</li>
           </ul>
           <div className={styles.subTitle}>{t(Strings.space_info_del_confirm2)}</div>
+          <div className={styles.subTitle}>{t(Strings.space_info_del_confirm3)}</div>
         </div>
         <WrapperTooltip style={{ width: '100%' }} tip={t(Strings.unauthorized_operation)} wrapper={!user?.isMainAdmin}>
           <Button

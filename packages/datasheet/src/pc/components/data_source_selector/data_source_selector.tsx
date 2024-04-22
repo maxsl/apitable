@@ -24,6 +24,7 @@ export const DataSourceSelectorBase: React.FC<ISearchPanelProps> = ({
   onChange,
   filterPermissionForNode,
   headerConfig,
+  single,
 }) => {
   const [localState, localDispatch] = useReducer(searchPanelReducer, {
     loading: true,
@@ -87,7 +88,9 @@ export const DataSourceSelectorBase: React.FC<ISearchPanelProps> = ({
       result[v] = baseData[v];
     }
     onChange(result);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    single,
     localState.currentDatasheetId,
     localState.currentMirrorId,
     localState.currentViewId,
@@ -97,6 +100,20 @@ export const DataSourceSelectorBase: React.FC<ISearchPanelProps> = ({
   ]);
 
   const { onNodeClick } = useNodeClick({ localDispatch, localState, needFetchDatasheetMeta: !!needNodeMetaData });
+
+  const handleNodeClick = (nodeType: 'Mirror' | 'Datasheet' | 'View' | 'Folder' | 'Form' | 'Automation', id: string) => {
+    // single is true, reset localState
+    if (single) {
+      localDispatch({
+        currentDatasheetId: '',
+        currentMirrorId: '',
+        currentAutomationId: '',
+        currentViewId: '',
+        currentFormId: '',
+      });
+    }
+    onNodeClick(nodeType, id);
+  };
 
   return (
     <div className={styles.searchPanel} onClick={(e) => e.stopPropagation()}>
@@ -132,9 +149,9 @@ export const DataSourceSelectorBase: React.FC<ISearchPanelProps> = ({
         value={localState.searchValue}
         switchVisible
       />
-      {!localState.showSearch && !embedId && <FolderBreadcrumb parents={localState.parents} onNodeClick={onNodeClick} />}
+      {!localState.showSearch && !embedId && <FolderBreadcrumb parents={localState.parents} onNodeClick={handleNodeClick} />}
       {localState.showSearch ? (
-        <SearchResult searchResult={localState.searchResult} onlyShowAvailable={localState.onlyShowEditableNode} onNodeClick={onNodeClick} />
+        <SearchResult searchResult={localState.searchResult} onlyShowAvailable={localState.onlyShowEditableNode} onNodeClick={handleNodeClick} />
       ) : (
         <FolderContent
           nodes={localState.nodes}
@@ -144,7 +161,7 @@ export const DataSourceSelectorBase: React.FC<ISearchPanelProps> = ({
           currentDatasheetId={localState.currentDatasheetId}
           currentFormId={localState.currentFormId}
           loading={localState.loading}
-          onNodeClick={onNodeClick}
+          onNodeClick={handleNodeClick}
           onlyShowAvailable={localState.onlyShowEditableNode}
         />
       )}

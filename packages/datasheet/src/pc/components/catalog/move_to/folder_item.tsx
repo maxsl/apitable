@@ -28,7 +28,7 @@ export const FolderItem: React.FC<
     folderId: string;
     folderName: string;
     icon: string;
-    onClick: (folderId: string, nodePrivate?: boolean) => void;
+    onClick: (_folderId: string, _nodePrivate?: boolean) => void;
     level?: string;
     nodePrivate?: boolean;
   }>

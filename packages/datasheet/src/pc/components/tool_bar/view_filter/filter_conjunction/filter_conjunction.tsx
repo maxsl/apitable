@@ -45,7 +45,7 @@ export const FilterConjunction: React.FC<React.PropsWithChildren<IConjunctionPro
   if (conditionIndex === 0) {
     return (
       <div className={styles.junction} style={{ paddingLeft: '10px', color: isViewLock ? color.thirdLevelText : '' }}>
-        {t(Strings.where)}
+        {t(Strings.when)}
       </div>
     );
   }

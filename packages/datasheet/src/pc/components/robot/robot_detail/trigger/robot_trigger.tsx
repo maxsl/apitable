@@ -116,6 +116,9 @@ export const customizer = (objValue, othValue) => {
   if (isNil(objValue) && isNil(othValue)) {
     return true;
   }
+  if(objValue === '******' || othValue === '******') {
+    return true;
+  }
   const l = pickBy(objValue, identity);
   const r = pickBy(othValue, identity);
   if (isEqual(l, r)) {

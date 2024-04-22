@@ -726,4 +726,19 @@ public interface INodeService extends IService<NodeEntity> {
      * @return boolean
      */
     boolean privateNodeOperation(Long userId, String nodeId);
+
+    /**
+     * whether the node linked by outside widget.
+     *
+     * @param nodeIds node id node
+     * @return boolean
+     */
+    boolean linkByOutsideWidgets(List<String> nodeIds);
+
+    /**
+     * whether the node linked by outside resource.
+     *
+     * @param nodeId node id node
+     */
+    void linkByOutsideResource(String nodeId);
 }

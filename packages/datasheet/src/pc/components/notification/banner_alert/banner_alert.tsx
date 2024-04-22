@@ -22,7 +22,7 @@ import { createRoot } from 'react-dom/client';
 import { Button, LinkButton, Typography, useThemeColors } from '@apitable/components';
 import { ConfigConstant, Strings, t } from '@apitable/core';
 import { CloseOutlined } from '@apitable/icons';
-import { Emoji } from 'pc/components/common/emoji';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
 import Vikaby from 'static/icon/workbench/vikaby-good.png';
 import styles from './style.module.less';
 
@@ -65,7 +65,10 @@ export const AlertUi = (props: IAlertProps) => {
       {upgrade && (
         <Button color="primary" size={'middle'} className={styles.upgradeBtn} onClick={onBtnClick}>
           <span style={{ position: 'relative', top: 3 }}>
-            <Emoji emoji={'star2'} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />
+            {getNodeIcon('star2', ConfigConstant.NodeType.DATASHEET, {
+              size: ConfigConstant.CELL_EMOJI_SIZE,
+              emojiSize: ConfigConstant.CELL_EMOJI_SIZE,
+            })}
           </span>
           <span style={{ position: 'relative', left: 3 }}>{t(Strings.upgrade)}</span>
         </Button>

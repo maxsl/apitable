@@ -196,7 +196,7 @@ public class NodeRubbishServiceImpl implements INodeRubbishService {
                 null, null);
         // modify the information of the recovery node
         boolean flag =
-            SqlHelper.retBool(nodeMapper.updateInfoByNodeId(nodeId, parentId, null, name, null));
+            SqlHelper.retBool(nodeMapper.updateInfoByNodeId(nodeId, parentId, null, name));
         ExceptionUtil.isTrue(flag, DatabaseException.EDIT_ERROR);
     }
 

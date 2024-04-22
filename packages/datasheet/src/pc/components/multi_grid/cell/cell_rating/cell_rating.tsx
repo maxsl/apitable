@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import * as React from 'react';
 import { ConfigConstant, IRatingField } from '@apitable/core';
-import { Emoji } from 'pc/components/common/emoji';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
 import { Rate } from 'pc/components/common/rate';
 import { ICellComponentProps } from '../cell_value/interface';
 import styles from './style.module.less';
@@ -36,12 +36,16 @@ export const CellRating: React.FC<React.PropsWithChildren<ICellRating>> = (props
   const handleChange = (value: number | null) => {
     !lock && isActive && onChange && onChange(value);
   };
+  const emoji = getNodeIcon(field.property.icon, ConfigConstant.NodeType.DATASHEET, {
+    size: ConfigConstant.CELL_EMOJI_SIZE,
+    emojiSize: ConfigConstant.CELL_EMOJI_SIZE,
+  });
   return (
     <div onClickCapture={() => setLock(false)} className={classNames(className, styles.ratingCell, 'ratingCell', { [styles.activeCell]: isActive })}>
       {isActive && !readonly ? (
         <Rate
           value={cellValue as number}
-          character={<Emoji emoji={field.property.icon} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />}
+          character={emoji}
           max={field.property.max}
           onChange={handleChange}
         />
@@ -49,7 +53,7 @@ export const CellRating: React.FC<React.PropsWithChildren<ICellRating>> = (props
         Boolean(cellValue) && (
           <Rate
             value={cellValue as number}
-            character={<Emoji emoji={field.property.icon} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />}
+            character={emoji}
             max={field.property.max}
             disabled
           />

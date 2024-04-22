@@ -133,4 +133,12 @@ public interface WidgetMapper {
      * @return count
      */
     Long selectCountBySpaceId(@Param("spaceId") String spaceId);
+
+    /**
+     * select node id by widget ids.
+     *
+     * @param widgetIds widget id list
+     * @return list of node ids
+     */
+    List<String> selectNodeIdsByWidgetIds(@Param("widgetIds") List<String> widgetIds);
 }

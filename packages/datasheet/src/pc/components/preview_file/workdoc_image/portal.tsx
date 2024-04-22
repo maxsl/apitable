@@ -19,9 +19,10 @@ export interface IWorkdocImage {
   onClose: () => void;
   file: any;
   onDelete: () => void;
+  isEditable: boolean;
 }
 
-export const WorkdocImagePortal = ({ onClose, file, onDelete }: IWorkdocImage) => {
+export const WorkdocImagePortal = ({ onClose, file, onDelete, isEditable }: IWorkdocImage) => {
   const [transformInfo, setTransformInfo] = useFrameSetState<ITransFormInfo>(initTransformInfo);
   const imgContainerRef = useRef<HTMLDivElement>(null);
   useClickAway((e) => {
@@ -86,13 +87,13 @@ export const WorkdocImagePortal = ({ onClose, file, onDelete }: IWorkdocImage) =
             const blob = await getFile(file.token);
             FileSaver.saveAs(blob, file.name);
           }}
-          readonly={false}
+          readonly={!isEditable}
           onRotate={onRotate}
           previewEnable
           isDocType={false}
           officePreviewUrl={''}
           onZoom={onZoom}
-          disabledDownload={false}
+          disabledDownload={!isEditable}
           isFullScreen={false}
         />
       </div>

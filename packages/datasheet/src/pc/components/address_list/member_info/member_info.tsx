@@ -99,8 +99,8 @@ export const MemberInfo: FC<React.PropsWithChildren<unknown>> = () => {
 
   const identity = getIdentity({
     ...memberInfo,
-    isMainAdmin: memberInfo.isSubAdmin,
-    isAdmin: memberInfo.isPrimary,
+    isMainAdmin: memberInfo.isPrimary,
+    isAdmin: memberInfo.isSubAdmin,
   });
 
   const { avatar, avatarColor, nickName, memberId, memberName, mobile, email, isMemberNameModified, teamData } = memberInfo;

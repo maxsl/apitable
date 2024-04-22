@@ -28,5 +28,5 @@ public class UnitMemberTeamDTO {
 
     private String teamName;
 
-    private Boolean isDeleted;
+    private boolean isDeleted;
 }

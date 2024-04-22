@@ -5394,7 +5394,7 @@
   "time_machine_action_title": "Storia delle operazioni",
   "time_machine_unlimited": "Storia illimitata delle macchine del tempo",
   "time_zone_inconsistent_tips": "Quando i fusi orari sono incoerenti, il fuso orario dell'ora di inizio verrà utilizzato per impostazione predefinita",
-  "timemachine_add": "Aggiunto ${nome}",
+  "timemachine_add": "Aggiunto ${name}",
   "timemachine_add_field": "aggiunte colonne ${name}",
   "timemachine_add_record": "aggiunte ${count} righe di record",
   "timemachine_add_widget": "aggiunto un nuovo widget",

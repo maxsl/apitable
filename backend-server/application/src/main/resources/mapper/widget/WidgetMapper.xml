@@ -180,4 +180,14 @@
         AND n.is_rubbish = 0
     </select>
 
+    <select id="selectNodeIdsByWidgetIds" resultType="java.lang.String">
+        SELECT DISTINCT node_id
+        FROM ${tablePrefix}widget
+        WHERE widget_id IN
+        <foreach item="item" index="index" collection="widgetIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND is_deleted = 0
+    </select>
+
 </mapper>

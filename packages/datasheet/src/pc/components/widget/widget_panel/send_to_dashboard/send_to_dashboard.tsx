@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { copyWidgetsToNode } from 'api/widget/api';
 import classNames from 'classnames';
 import Image from 'next/image';
 import * as React from 'react';
@@ -23,10 +24,10 @@ import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Button, Skeleton, ThemeName, useThemeColors } from '@apitable/components';
-import { Api, CollaCommandName, ConfigConstant, ExecuteResult, Navigation, Selectors, StoreActions, Strings, t, WidgetApi } from '@apitable/core';
+import { Api, CollaCommandName, ConfigConstant, ExecuteResult, Navigation, Selectors, StoreActions, Strings, t } from '@apitable/core';
 import { DashboardOutlined } from '@apitable/icons';
-import { copyWidgetsToNode } from 'api/widget/api';
-import { Emoji, Message, Modal } from 'pc/components/common';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
+import { Message, Modal } from 'pc/components/common';
 import { TComponent } from 'pc/components/common/t_component';
 import { Router } from 'pc/components/route_manager/router';
 import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
@@ -159,9 +160,10 @@ const SentToDashboard: React.FC<React.PropsWithChildren<ISentToDashboardProps>> 
                   }}
                   key={item.nodeId}
                 >
-                  {item.icon ? (
-                    <Emoji emoji={item.icon} size={16} set="apple" />
-                  ) : (
+                  {item.icon ? getNodeIcon(item.icon, ConfigConstant.NodeType.DATASHEET, {
+                    size: 16,
+                    emojiSize: 16,
+                  }) : (
                     <DashboardOutlined color={isActive ? colors.primaryColor : colors.fourthLevelText} />
                   )}
                   <span>{item.nodeName}</span>

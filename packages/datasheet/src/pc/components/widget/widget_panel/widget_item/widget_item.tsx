@@ -18,6 +18,7 @@
 
 import { useToggle } from 'ahooks';
 import classNames from 'classnames';
+import { SimpleEmitter } from 'modules/shared/simple_emitter';
 import Image from 'next/image';
 import * as React from 'react';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
@@ -34,12 +35,10 @@ import {
 } from '@apitable/core';
 import { RuntimeEnv } from '@apitable/widget-sdk';
 import { WidgetLoadError } from '@apitable/widget-sdk/dist/initialize_widget';
-import { SimpleEmitter } from 'modules/shared/simple_emitter';
 import { ComponentDisplay, ScreenSize } from 'pc/components/common/component_display';
 import {
   DataSourceSelectorForNode
 } from 'pc/components/data_source_selector_enhanced/data_source_selector_for_node/data_source_selector_for_node';
-import { SearchPanel, SecondConfirmType } from 'pc/components/datasheet_search_panel';
 import { expandRecordInCenter } from 'pc/components/expand_record';
 import { expandRecordPicker } from 'pc/components/record_picker';
 import { WidgetHeader } from 'pc/components/widget/widget_panel/widget_item/widget_header';
@@ -49,8 +48,8 @@ import { useAppDispatch } from 'pc/hooks/use_app_dispatch';
 import { resourceService } from 'pc/resource_service';
 import { store } from 'pc/store';
 import { useAppSelector } from 'pc/store/react-redux';
-import PngLinkdatasheetDark from 'static/icon/datasheet/chart/dashboard_widget_empty_dark.png';
-import PngLinkdatasheetLight from 'static/icon/datasheet/chart/dashboard_widget_empty_light.png';
+import PngLinkDatasheetDark from 'static/icon/datasheet/chart/dashboard_widget_empty_dark.png';
+import PngLinkDatasheetLight from 'static/icon/datasheet/chart/dashboard_widget_empty_light.png';
 import { ErrorWidget } from '../../error_widget';
 import { closeWidgetRoute, expandWidgetRoute } from '../../expand_widget';
 import { useDevLoadCheck, useFullScreen } from '../../hooks';
@@ -99,7 +98,7 @@ export const WidgetItem: React.FC<React.PropsWithChildren<IWidgetItemProps>> = (
   const errorCode = useAppSelector((state) => Selectors.getDatasheetErrorCode(state, widgetBindDatasheetId));
   const dispatch = useAppDispatch();
   const themeName = useAppSelector((state) => state.theme);
-  const PngLinkdatasheet = themeName === ThemeName.Light ? PngLinkdatasheetLight : PngLinkdatasheetDark;
+  const PngLinkDatasheet = themeName === ThemeName.Light ? PngLinkDatasheetLight : PngLinkDatasheetDark;
 
   const [searchPanelVisible, setSearchPanelVisible] = useState(false);
   const [isSettingOpened, { toggle: toggleSettingOpened }] = useToggle(false);
@@ -225,7 +224,7 @@ export const WidgetItem: React.FC<React.PropsWithChildren<IWidgetItemProps>> = (
           {widget &&
             (doNotBindDatasheet ? (
               <div className={styles.mask}>
-                <Image src={PngLinkdatasheet} alt="" width={160} height={120} objectFit="contain"/>
+                <Image src={PngLinkDatasheet} alt="" width={160} height={120} objectFit="contain"/>
                 {!linkId && (
                   <span
                     onClick={() => {
@@ -278,6 +277,7 @@ export const WidgetItem: React.FC<React.PropsWithChildren<IWidgetItemProps>> = (
               folderId: rootNodeId,
               datasheetId: '',
             }}
+            single
             requiredData={['datasheetId', 'mirrorId']}
           />
         )}

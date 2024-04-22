@@ -18,6 +18,7 @@
 
 package com.apitable.automation.service;
 
+import cn.hutool.json.JSON;
 import com.apitable.automation.entity.AutomationActionEntity;
 import com.apitable.automation.model.ActionVO;
 import com.apitable.automation.model.CreateActionRO;
@@ -83,4 +84,12 @@ public interface IAutomationActionService {
      * @param userId   operator user id
      */
     void deleteByDatabus(String robotId, String actionId, Long userId);
+
+    /**
+     * handle action input, replace password.
+     *
+     * @param input input
+     * @return input
+     */
+    JSON handleActionInput(String input);
 }

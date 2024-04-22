@@ -70,7 +70,7 @@ public interface StaticsMapper {
      * @param spaceId space id
      * @return total
      */
-    Long countRecordsBySpaceId(@Param("spaceId") String spaceId);
+    List<String> countRecordsBySpaceId(@Param("spaceId") String spaceId);
 
     /**
      * Count the rows of all tables in the space.

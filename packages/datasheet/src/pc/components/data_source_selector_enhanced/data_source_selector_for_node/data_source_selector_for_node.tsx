@@ -20,6 +20,7 @@ interface IDataSourceSelectorForAIProps {
   nodeTypes: ConfigConstant.NodeType[];
   permissionRequired?: keyof IPermissions;
   requiredData?: (keyof IOnChangeParams)[];
+  single?: boolean;
 
   footer?: React.ReactNode;
   onHide(): void;
@@ -33,6 +34,7 @@ export const DataSourceSelectorForNode: React.FC<IDataSourceSelectorForAIProps> 
   defaultNodeIds,
   permissionRequired = 'editable',
   requiredData = ['datasheetId'],
+  single,
 }) => {
   const [result, setResult] = useState<IOnChangeParams>();
   const { fetchExtraData, isLoadingExtraData } = useFetchExtraData();
@@ -84,6 +86,7 @@ export const DataSourceSelectorForNode: React.FC<IDataSourceSelectorForAIProps> 
         <div className={styles.container}>
           <DataSourceSelectorBase
             onChange={_onChange}
+            single={single}
             defaultNodeIds={defaultNodeIds}
             headerConfig={
               isPc

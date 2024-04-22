@@ -554,7 +554,7 @@
       "name": [
         "find"
       ],
-      "when": "!isRecordExpanding",
+      "when": "!isRecordExpanding && !isWorkdocOpen",
       "id": "cmd+f",
       "command": "ToggleFindPanel",
       "description": "查找",

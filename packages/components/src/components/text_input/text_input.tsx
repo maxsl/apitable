@@ -169,6 +169,8 @@ export const TextInput = React.forwardRef(({
     e.stopPropagation();
     e.nativeEvent.stopPropagation();
     setFocus(true);
+    // @ts-ignore
+    onFocus?.(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {

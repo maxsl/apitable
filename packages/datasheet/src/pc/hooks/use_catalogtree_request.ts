@@ -21,6 +21,7 @@ import {
   Api,
   ConfigConstant,
   IAxiosResponse,
+  INode,
   INodesMapItem,
   IOptNode,
   IReduxState,
@@ -558,7 +559,7 @@ export const useCatalogTreeRequest = () => {
       if (id === nodeId) {
         return true;
       }
-      if (treeNodesMap[id].children.length) {
+      if (nodeMaps[id].children.length) {
         return isFindNodeInTree(nodeMaps[id], nodeId, module);
       }
       return false;
@@ -570,6 +571,11 @@ export const useCatalogTreeRequest = () => {
     return Api.getFavoriteNodeList().then((res) => {
       const { data, success, message } = res.data;
       if (success) {
+        // multi level tree node need cache primary data
+        data.forEach((node: INode) => {
+          const flatTreeData = Selectors.flatNodeTree([node]);
+          dispatch(StoreActions.addNodeToMap(flatTreeData, true, node.nodePrivate ? ConfigConstant.Modules.PRIVATE : undefined));
+        });
         dispatch(StoreActions.generateFavoriteTree(Selectors.flatNodeTree(data)));
         dispatch(StoreActions.setTreeLoading(false, ConfigConstant.Modules.FAVORITE));
         return data;

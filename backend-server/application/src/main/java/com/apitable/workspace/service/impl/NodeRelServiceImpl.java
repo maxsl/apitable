@@ -26,6 +26,7 @@ import com.apitable.control.infrastructure.ControlTemplate;
 import com.apitable.core.util.ExceptionUtil;
 import com.apitable.workspace.dto.NodeRelDTO;
 import com.apitable.workspace.entity.NodeRelEntity;
+import com.apitable.workspace.enums.IdRulePrefixEnum;
 import com.apitable.workspace.mapper.NodeMapper;
 import com.apitable.workspace.mapper.NodeRelMapper;
 import com.apitable.workspace.service.INodeRelService;
@@ -36,6 +37,7 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -155,5 +157,20 @@ public class NodeRelServiceImpl implements INodeRelService {
     public NodeRelEntity getByRelNodeId(String relNodeId) {
         log.info("Gets the node association relationship with the associated node [{}]", relNodeId);
         return nodeRelMapper.selectByRelNodeId(relNodeId);
+    }
+
+    @Override
+    public boolean relInTheSameFolder(List<String> nodeIds) {
+        List<String> mainNodeIds =
+            nodeIds.stream().filter(i -> i.startsWith(IdRulePrefixEnum.DST.getIdRulePrefixEnum()))
+                .toList();
+        if (!mainNodeIds.isEmpty()) {
+            List<String> relNodeIds = nodeRelMapper.selectRelNodeIdsByMainNodeIds(mainNodeIds);
+            if (!relNodeIds.isEmpty()) {
+                relNodeIds = nodeMapper.selectNodeIdByNodeIdIn(relNodeIds);
+                return new HashSet<>(nodeIds).containsAll(relNodeIds);
+            }
+        }
+        return true;
     }
 }

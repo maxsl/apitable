@@ -1166,6 +1166,7 @@
   "del_invitation_link_desc": "The link will be invalid after deletion",
   "del_space_now": "Delete Space forever",
   "del_space_now_tip": "The Space can't be restored after deletion. All file nodes and attachments will be deleted.",
+  "del_space_now_confirm_tip": "For subscribers: Benefits attach to your Space. Removing it cancels those benefits. Be wary!",
   "del_space_res_tip": "The Space deleted",
   "del_team_success": "Delete Team Success",
   "del_view_content": "Are you sure you want to delete the ${view_name} view?",
@@ -3756,7 +3757,7 @@
   "remove_from_role": "You were removed from the \"<a class=\"roleName\"></a>\" role of the \"<a class=\"spaceName\"></a>\" Space by <a class=\"memberName\"></a>.",
   "remove_from_space": "Remove from Space",
   "remove_from_space_confirm_tip": "Confirm to completely remove the member from this workspace. After removal, the member's private workspace files will no longer occupy the capacity of the workspace station.",
-  "create_private_node_tip": "Personal or temporary draft documents can be created here, ${link}",
+  "create_private_node_tip": "Personal or temporary draft documents can be created here ${link}",
   "remove_from_team": "Remove from team",
   "remove_from_team_confirm_tip": "Confirm to remove the member from this team",
   "remove_from_the_team": "Remove",
@@ -4553,6 +4554,7 @@
   "space_info": "Overview",
   "space_info_del_confirm1": "1. Deleting this Space will clean up the following data:",
   "space_info_del_confirm2": "2. The Space will be deleted completely after 7 days. You can restore the Space before then.",
+  "space_info_del_confirm3": "3. For subscribers: Benefits attach to your Space. Removing it cancels those benefits. Be wary!",
   "space_info_feishu_desc": "You are using a third-party integration. To delete the Space, please disable the third-party integration first.  ",
   "space_info_feishu_label": "Integrations",
   "space_join_apply": "<a class=\"userName\"></a> requested to join the \"<a class=\"spaceName\"></a>\" Space.",
@@ -6045,5 +6047,6 @@
   "private_help_link": "https://help.aitable.ai/docs/guide/team-and-private-area#private-area",
   "move_datasheet_link_warn": "Cannot be moved to Team Area alone, because there is a two-way link from the current datasheet to another datasheet, it is recommended to put them in a folder and then move them",
   "move_folder_link_warn": "Cannot be moved to Team Area because the files in the current folder are linked to files outside the folder (may be two-way links or linked by forms, etc.) We recommend that they be placed in a folder before moving",
-  "move_other_link_warn": "It is not allowed to move ${node type} to Team Area alone, because it connects to the datasheet of Private Area, it is recommended to put them in a folder before moving them"
+  "move_other_link_warn": "It is not allowed to move ${node type} to Team Area alone, because it connects to the datasheet of Private Area, it is recommended to put them in a folder before moving them",
+  "move_other_link_no_permission": "Unable to move to the corresponding folder because you do not have administrative rights to the folder"
 }

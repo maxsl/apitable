@@ -137,4 +137,20 @@ public interface IWidgetService {
      * @param widgetIds  widget id list
      */
     void checkWidgetReference(List<String> subNodeIds, List<String> widgetIds);
+
+    /**
+     * get widget resources.
+     *
+     * @param widgetIds widget id list
+     * @return node ids
+     */
+    List<String> getWidgetNodeIds(List<String> widgetIds);
+
+    /**
+     * get node widgets.
+     *
+     * @param nodeIds node id.
+     * @return list of widget id
+     */
+    List<String> getNodeWidgetIds(List<String> nodeIds);
 }

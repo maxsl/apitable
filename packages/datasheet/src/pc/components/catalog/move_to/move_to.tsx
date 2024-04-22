@@ -19,7 +19,7 @@
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Api, ConfigConstant, IParent, Navigation, StoreActions, Strings, t } from '@apitable/core';
+import { Api, ConfigConstant, IParent, Navigation, StoreActions, Strings, t, StatusCode } from '@apitable/core';
 import { ComponentDisplay, ScreenSize } from 'pc/components/common/component_display';
 import { Message } from 'pc/components/common/message/message';
 import { Popup } from 'pc/components/common/mobile/popup';
@@ -108,11 +108,13 @@ export const MoveTo: React.FC<
       const unitId = catalog === ConfigConstant.Modules.PRIVATE ? userUnitId : undefined;
       Api.nodeMove(nodeId, selectedNodeId, undefined, unitId).then((res) => {
         setConfirmLoading(false);
-        const { data, success, message } = res.data;
-        console.log('moveTo -> data', data, success, message);
+        const { data, success, code } = res.data;
         if (!success) {
+          console.log('code', code, typeof code);
           let content: string | React.ReactNode = '';
-          if (nodeId.startsWith(ConfigConstant.NodeTypeReg.DATASHEET)) {
+          if (code === StatusCode.NOT_PERMISSION) {
+            content = t(Strings.move_other_link_no_permission);
+          } else if (nodeId.startsWith(ConfigConstant.NodeTypeReg.DATASHEET)) {
             content = t(Strings.move_datasheet_link_warn);
           } else if (nodeId.startsWith(ConfigConstant.NodeTypeReg.FOLDER)) {
             content = t(Strings.move_folder_link_warn);
@@ -129,10 +131,18 @@ export const MoveTo: React.FC<
           });
           return;
         }
-        dispatch(StoreActions.moveTo(nodeId, selectedNodeId, 0, catalog));
-        dispatch(StoreActions.addNodeToMap(data, true, catalog));
-        onClose && onClose();
-        moveSuccess(nodeId);
+        // private => team should reload
+        if (isPrivate && catalog === ConfigConstant.Modules.CATALOG) {
+          moveSuccess(nodeId);
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          dispatch(StoreActions.moveTo(nodeId, selectedNodeId, 0, catalog));
+          dispatch(StoreActions.addNodeToMap(data, true, catalog));
+          onClose && onClose();
+          moveSuccess(nodeId);
+        }
       });
     };
     if (!nodePermitSet) {

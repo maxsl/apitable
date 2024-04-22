@@ -108,7 +108,6 @@ export const TemplateChoice: FC<React.PropsWithChildren<ITemplateChoiceProps>> =
   const getAssertUrl = useGetSignatureAssertFunc();
 
   if (!_templateRecommendData) {
-    console.log({ cc: _templateRecommendData });
     return null;
   }
 

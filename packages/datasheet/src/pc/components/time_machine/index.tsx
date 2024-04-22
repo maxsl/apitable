@@ -71,7 +71,7 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
   const curDatasheet = useAppSelector((state) => Selectors.getDatasheet(state, datasheetId));
   const activeNodePrivate = useAppSelector((state) => Selectors.getActiveNodePrivate(state));
   const [curPreview, setCurPreview] = useState<number | string>();
-  const [changesetList, setChangesetList] = useState<IRemoteChangeset[]>([]);
+  const [changesetList, setChangesetList] = useState<IRemoteChangeset[] | null>(null);
   const [fetching, setFetching] = useState(false);
   const [uuidMap, setUuidMap] = useState<Record<string, IMemberInfoInAddressList>>();
   const currentRevision = useAppSelector((state) => Selectors.getResourceRevision(state, datasheetId, ResourceType.Datasheet)!);
@@ -87,8 +87,8 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
   }, [changesetList]);
 
   const isEmpty = useMemo(() => {
-    return !changesetList?.length;
-  }, [changesetList?.length]);
+    return Array.isArray(changesetList) && !changesetList.length;
+  }, [changesetList]);
 
   const currentDatasheetIds = useAppSelector(Selectors.getDatasheetIds);
   const [rollbackIng, setRollbackIng] = useState(false);
@@ -105,7 +105,7 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
         // The returned data is from low to high, when displaying, you need to display the high version first
         const csl = res.data.data.reverse();
         console.log('Load changesetList: ', csl);
-        const nextCsl = changesetList.concat(csl);
+        const nextCsl = changesetList === null ? csl : changesetList.concat(csl);
         setChangesetList(nextCsl.filter((item) => item.operations.filter((op) => !op.cmd.startsWith('System')).length > 0));
       })
       .finally(() => {
@@ -113,7 +113,7 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
       });
   };
 
-  const lastChangeset = changesetList[changesetList.length - 1];
+  const lastChangeset = changesetList && changesetList[changesetList.length - 1];
   const noMore = !lastChangeset || lastChangeset.revision === 1 || changesetList.length >= MAX_COUNT;
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollInfo = useScroll(contentRef);
@@ -174,6 +174,7 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
 
   const executePreview = useCallback(
     (operations: any, index: any) => {
+      if (!changesetList) return;
       const cloneDatasheet = fastCloneDeep(curDatasheet)!;
       const actions = getRollbackActions(operations, store.getState(), cloneDatasheet.snapshot);
       console.log('---------preview actions', actions);
@@ -203,6 +204,7 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
 
   const execute = useCallback(
     (index: number, preview = false) => {
+      if (!changesetList) return;
       const operations = changesetList
         .slice(0, index + 1)
         .map((cs) => {
@@ -251,16 +253,6 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
     [execute],
   );
 
-  if (!changesetList) {
-    return (
-      <>
-        <Skeleton width="38%" />
-        <Skeleton count={2} />
-        <Skeleton width="61%" />
-      </>
-    );
-  }
-
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -287,48 +279,56 @@ export const TimeMachine: React.FC<React.PropsWithChildren<{ onClose: (visible: 
         }}
       >
         <TabPane tab={t(Strings.time_machine_action_title)} key={TabPaneKeys.ACTION}>
-          <div className={styles.content} ref={contentRef}>
-            {isEmpty ? (
-              <div className={styles.noList}>
-                <Image src={DataEmpty} width={240} height={180} alt="" />
-                <p>{t(Strings.rollback_history_empty)}</p>
-              </div>
-            ) : (
-              changesetList.map((item, index) => {
-                const memberInfo = uuidMap && uuidMap[item.userId!];
-                const title =
-                  getSocialWecomUnitName?.({
-                    name: memberInfo?.memberName,
-                    isModified: memberInfo?.isMemberNameModified,
-                    spaceInfo,
-                  }) || '';
-                const ops = item.operations.filter((op) => !op.cmd.startsWith('System'));
-                return (
-                  <section
-                    className={styles.listItem}
-                    key={`${item.messageId}-${item.revision}`}
-                    data-active={index === curPreview}
-                    onClick={() => {
-                      onPreviewClick(index);
-                      console.log('ops', ops);
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Avatar id={item.userId || ''} title={typeof title === 'string' ? title : ''} size={24} src={memberInfo?.avatar} />
-                      <div>
-                        <div className={styles.title}>
-                          <span style={{ paddingRight: '4px' }}>{title}</span>
-                          <span>{getOperationInfo(ops)}</span>
+          {!changesetList ? (
+            <div className={'vk-px-2'}>
+              <Skeleton width="38%" />
+              <Skeleton count={2} />
+              <Skeleton width="61%" />
+            </div>
+          ) : (
+            <div className={styles.content} ref={contentRef}>
+              {isEmpty ? (
+                <div className={styles.noList}>
+                  <Image src={DataEmpty} width={240} height={180} alt="" />
+                  <p>{t(Strings.rollback_history_empty)}</p>
+                </div>
+              ) : (
+                changesetList.map((item, index) => {
+                  const memberInfo = uuidMap && uuidMap[item.userId!];
+                  const title =
+                    getSocialWecomUnitName?.({
+                      name: memberInfo?.memberName,
+                      isModified: memberInfo?.isMemberNameModified,
+                      spaceInfo,
+                    }) || '';
+                  const ops = item.operations.filter((op) => !op.cmd.startsWith('System'));
+                  return (
+                    <section
+                      className={styles.listItem}
+                      key={`${item.messageId}-${item.revision}`}
+                      data-active={index === curPreview}
+                      onClick={() => {
+                        onPreviewClick(index);
+                        console.log('ops', ops);
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <Avatar id={item.userId || ''} title={typeof title === 'string' ? title : ''} size={24} src={memberInfo?.avatar} />
+                        <div>
+                          <div className={styles.title}>
+                            <span style={{ paddingRight: '4px' }}>{title}</span>
+                            <span>{getOperationInfo(ops)}</span>
+                          </div>
+                          <div className={styles.timestamp}>{dayjs.tz(item.createdAt).format(DATEFORMAT)}</div>
                         </div>
-                        <div className={styles.timestamp}>{dayjs.tz(item.createdAt).format(DATEFORMAT)}</div>
                       </div>
-                    </div>
-                  </section>
-                );
-              })
-            )}
-            {!isEmpty && <div className={styles.bottomTip}>{noMore ? t(Strings.no_more) : t(Strings.data_loading)}</div>}
-          </div>
+                    </section>
+                  );
+                })
+              )}
+              {!isEmpty && <div className={styles.bottomTip}>{noMore ? t(Strings.no_more) : t(Strings.data_loading)}</div>}
+            </div>
+          )}
         </TabPane>
         {Boolean(Backup) && !activeNodePrivate && (
           <TabPane tab={t(Strings.backup_title)} key={TabPaneKeys.BACKUP}>

@@ -61,4 +61,12 @@ public interface DatasheetWidgetMapper extends BaseMapper<DatasheetWidgetEntity>
      * @return affected rows
      */
     int insertBatch(@Param("entities") List<DatasheetWidgetEntity> entities);
+
+    /**
+     * query by dst id.
+     *
+     * @param dstIds dst id
+     * @return list of widget id
+     */
+    List<String> selectWidgetIdByDstIds(@Param("dstIds") List<String> dstIds);
 }

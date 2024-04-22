@@ -69,4 +69,12 @@ public interface NodeRelMapper extends BaseMapper<NodeRelEntity> {
      * @return affected rows
      */
     int insertBatch(@Param("entities") List<NodeRelEntity> entities);
+
+    /**
+     * get count by main node id.
+     *
+     * @param mainNodeIds main node id
+     * @return total amount
+     */
+    List<String> selectRelNodeIdsByMainNodeIds(@Param("mainNodeIds") List<String> mainNodeIds);
 }

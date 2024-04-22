@@ -20,6 +20,9 @@ import { useMount } from 'ahooks';
 import parser from 'html-react-parser';
 import { isInteger } from 'lodash';
 import difference from 'lodash/difference';
+import { ShortcutActionName } from 'modules/shared/shortcut_key';
+import { getShortcutKeyString } from 'modules/shared/shortcut_key/keybinding_config';
+import { appendRow, Direction } from 'modules/shared/shortcut_key/shortcut_actions/append_row';
 import path from 'path-browserify';
 import * as React from 'react';
 import { KeyboardEvent, useRef, useCallback } from 'react';
@@ -50,9 +53,6 @@ import {
   ExpandOutlined,
   ArchiveOutlined
 } from '@apitable/icons';
-import { ShortcutActionName } from 'modules/shared/shortcut_key';
-import { getShortcutKeyString } from 'modules/shared/shortcut_key/keybinding_config';
-import { appendRow, Direction } from 'modules/shared/shortcut_key/shortcut_actions/append_row';
 import { Message } from 'pc/components/common';
 import { Modal } from 'pc/components/common/modal/modal/modal';
 import { notifyWithUndo } from 'pc/components/common/notify';
@@ -70,6 +70,7 @@ import { copy2clipBoard } from '../../../utils/dom';
 import { IInputEditor, InputMenuItem } from './input_menu_item';
 
 export const GRID_RECORD_MENU = 'GRID_RECORD_MENU';
+const CHUCK_SIZE = 300;
 
 export function copyLink(recordId: string) {
   const url = new URL(window.location.href);
@@ -151,12 +152,18 @@ export const RecordMenu: React.FC<React.PropsWithChildren<IRecordMenuProps>> = (
       data.push(recordId);
     }
     // The setTimeout is used here to ensure that the user is alerted that a large amount of data is being deleted before it is deleted
-    const { result } = resourceService.instance!.commandManager.execute({
-      cmd: CollaCommandName.ArchiveRecords,
-      data,
-    });
+    let rlt: any;
+    const times = Math.ceil(data.length / CHUCK_SIZE);
+    for (let i = 0; i < times; i++) {
+      const chunks = data.slice(i * CHUCK_SIZE, (i + 1) * CHUCK_SIZE);
+      rlt = resourceService.instance!.commandManager.execute({
+        cmd: CollaCommandName.ArchiveRecords,
+        data: chunks,
+      });
+      console.log(`Archiving: ${data.length} records，archived ${CHUCK_SIZE * i + chunks.length}`);
+    }
 
-    if (ExecuteResult.Success === result) {
+    if (ExecuteResult.Success === rlt?.result) {
       Message.success({ content: t(Strings.archive_record_success) });
 
       dispatch(batchActions([StoreActions.clearSelection(datasheetId), StoreActions.clearActiveRowInfo(datasheetId)]));
@@ -181,12 +188,18 @@ export const RecordMenu: React.FC<React.PropsWithChildren<IRecordMenuProps>> = (
       data.push(recordId);
     }
     // The setTimeout is used here to ensure that the user is alerted that a large amount of data is being deleted before it is deleted
-    const { result } = resourceService.instance!.commandManager.execute({
-      cmd: CollaCommandName.DeleteRecords,
-      data,
-    });
+    let rlt: any;
+    const times = Math.ceil(data.length / CHUCK_SIZE);
+    for (let i = 0; i < times; i++) {
+      const chunks = data.slice(i * CHUCK_SIZE, (i + 1) * CHUCK_SIZE);
+      rlt = resourceService.instance!.commandManager.execute({
+        cmd: CollaCommandName.DeleteRecords,
+        data: chunks,
+      });
+      console.log(`Deleting: ${data.length} deleted ${CHUCK_SIZE * i + chunks.length}`);
+    }
 
-    if (ExecuteResult.Success === result) {
+    if (ExecuteResult.Success === rlt.result) {
       notifyWithUndo(
         t(Strings.notification_delete_record_by_count, {
           count: data.length,
@@ -424,6 +437,7 @@ export const RecordMenu: React.FC<React.PropsWithChildren<IRecordMenuProps>> = (
             title: t(Strings.menu_archive_record),
             content: getArchiveNotice(t(Strings.archive_notice)),
             onOk: () => archiveRecord(recordId),
+            okText: t(Strings.confirm),
             closable: true,
             hiddenCancelBtn: false,
           });

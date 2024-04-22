@@ -19,9 +19,9 @@
 import { Dispatch, SetStateAction } from 'react';
 import * as React from 'react';
 import { Button, useThemeColors } from '@apitable/components';
-import { ICheckboxField, IField, t, Strings } from '@apitable/core';
+import { ICheckboxField, IField, t, Strings, ConfigConstant } from '@apitable/core';
 import { ChevronDownOutlined } from '@apitable/icons';
-import { Emoji } from 'pc/components/common';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
 import { EmojiPicker } from 'pc/components/common/emoji_picker';
 import { EMOJI_SIZE } from '../../catalog/tree/tree';
 import styles from './styles.module.less';
@@ -51,7 +51,10 @@ export const FormateCheckbox: React.FC<React.PropsWithChildren<IFormateCheckboxP
         paddingLeft: 0,
       }}
     >
-      <Emoji emoji={currentField.property.icon} set="apple" size={EMOJI_SIZE} />
+      {getNodeIcon(currentField.property.icon, ConfigConstant.NodeType.DATASHEET, {
+        size: EMOJI_SIZE,
+        emojiSize: EMOJI_SIZE,
+      })}
       <span style={{ marginLeft: 4 }}>
         <ChevronDownOutlined size={16} color={colors.fourthLevelText} />
       </span>

@@ -22,9 +22,10 @@ import {
   IReduxState,
   ConfigConstant,
   IField,
+  Api,
 } from '@apitable/core';
 import { AddOutlined, SyncOnOutlined } from '@apitable/icons';
-import { automationApiClient, workbenchClient } from 'pc/common/api-client';
+import { automationApiClient } from 'pc/common/api-client';
 import { AutomationConstant, CONST_MAX_TRIGGER_COUNT } from 'pc/components/automation/config';
 import { automationSourceAtom } from 'pc/components/automation/controller'; // trace
 import { IOnChangeParams } from 'pc/components/data_source_selector/interface';
@@ -53,7 +54,7 @@ interface IFormateButtonProps {
   datasheetId?: string;
 }
 
-const StyledIntput = styled(Input)`
+const StyledInput = styled(Input)`
   .ant-input:focus {
     border-right-style: none;
   }
@@ -84,8 +85,9 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
   const { text, style, action } = currentField.property;
 
   const [bingAutomationVisible, setBingAutomationVisible] = useState(false);
-
+  const userUnitId = useAppSelector((state) => state.user.info?.unitId);
   const datasheetId = useAppSelector((state: IReduxState) => propDatasheetId || Selectors.getActiveDatasheetId(state))!;
+  const isDatasheetPrivate = useAppSelector((state) => Selectors.getDatasheet(state, propDatasheetId)?.nodePrivate);
 
   const activeFieldState = useAppSelector((state) => Selectors.gridViewActiveFieldState(state, datasheetId));
   const handleModify = useCallback(
@@ -107,7 +109,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
 
   const textInputRef = useRef<InputRef>(null);
   const urlInputRef = useRef<InputRef>(null);
-  const inputformulaRef = useRef<InputRef>(null);
+  const inputFormulaRef = useRef<InputRef>(null);
 
   const transformedExp = useMemo(() => {
     const openLink = action?.openLink;
@@ -120,7 +122,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
   }, [action, fieldMap, fieldPermissionMap]);
 
   const setFieldProperty = (key: string) => (value: any) => {
-    const updataProperty = (newProperty: Partial<IButtonProperty> = {}) => {
+    const updateProperty = (newProperty: Partial<IButtonProperty> = {}) => {
       const newItem = {
         ...currentField,
         // @ts-ignore
@@ -131,7 +133,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
       // @ts-ignore
       setCurrentField(newItem);
     };
-    updataProperty({
+    updateProperty({
       ...currentField.property,
       [key]: value,
     });
@@ -171,7 +173,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
       },
     });
     setCurrentField(data as IButtonField);
-    inputformulaRef.current && inputformulaRef.current.focus();
+    inputFormulaRef.current && inputFormulaRef.current.focus();
   };
 
   const router = useRouter();
@@ -221,18 +223,18 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
 
   const setAutomationSource = useSetAtom(automationSourceAtom);
 
-  const handleClick=useCallback(async () => {
-    const r = await workbenchClient.create3({
-      nodeOpRo: {
-        preNodeId: datasheetId,
-        parentId: datasheetParentId,
-        type: 10,
-      },
+  const handleClick = useCallback(async () => {
+    const res = await Api.addNode({
+      preNodeId: datasheetId,
+      parentId: datasheetParentId,
+      type: 10,
+      unitId: isDatasheetPrivate ? userUnitId : undefined
     });
-    if(!r.success) {
-      message.error(r.message);
+    const { data, message, success } = res.data;
+    if(!success) {
+      message.error(message);
     }
-    const automationId = r?.data?.nodeId;
+    const automationId = data?.nodeId;
 
     if (!automationId) {
       return;
@@ -260,7 +262,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
         router.push(`/workbench/${automationId}`);
       }, 50);
     });
-  }, [currentField, datasheetId, datasheetParentId, handleAddTrigger, handleModify, router, setAutomationSource]);
+  }, [currentField, datasheetId, datasheetParentId, handleAddTrigger, handleModify, router, setAutomationSource, userUnitId]);
 
   const handleClickDebounce = debounce(handleClick, 300);
   const handleAutomationChange = useCallback(async ({ automationId }: IOnChangeParams) => {
@@ -452,7 +454,7 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
           <div className={settingStyles.sectionTitle}>URL</div>
           <div className={styles.openLinkInput}>
             {action?.openLink?.type === OpenLinkType.Url ? (
-              <StyledIntput
+              <StyledInput
                 ref={urlInputRef}
                 value={action.openLink.expression}
                 placeholder={t(Strings.open_url_tips_string)}
@@ -506,8 +508,8 @@ export const FormatButton: React.FC<React.PropsWithChildren<IFormateButtonProps>
                 }
               />
             ) : (
-              <StyledIntput
-                ref={inputformulaRef}
+              <StyledInput
+                ref={inputFormulaRef}
                 className="code"
                 placeholder={t(Strings.input_formula)}
                 value={transformedExp}

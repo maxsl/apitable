@@ -99,9 +99,7 @@ export const getNodeIcon = (
         }}
         alt=""
       />
-    ) : (
-      <Emoji emoji={icon} size={emojiSize} set="apple" />
-    );
+    ) :<Emoji emoji={icon} size={emojiSize} />;
   }
   const nodeConfig = nodeConfigData.find((item) => item.type === type);
   if (!nodeConfig) return;

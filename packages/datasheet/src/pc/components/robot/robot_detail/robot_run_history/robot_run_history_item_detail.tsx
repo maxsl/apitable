@@ -18,7 +18,7 @@
 
 import axios from 'axios';
 import useSWR from 'swr';
-import { Box, useTheme, Typography } from '@apitable/components';
+import { Box, Typography } from '@apitable/components';
 import { Strings, t } from '@apitable/core';
 import { useNodeTypeByIds } from '../../hooks';
 import { IRobotHistoryTask } from '../../interface';
@@ -28,11 +28,11 @@ import { RobotRunHistoryNodeWrapper } from './robot_run_history_item_detail_node
 import { RobotRunHistoryTriggerDetail } from './robot_run_history_item_detail_trigger';
 
 const nestReq = axios.create({
-  baseURL: '/nest/v1/',
+  baseURL: '/api/v1/',
 });
 
 interface IRobotRunHistoryItemDetailProps {
-    taskId: string;
+  taskId: string;
 }
 
 export const useRunTaskDetail = (taskId: string) => {
@@ -91,9 +91,9 @@ export const RobotRunHistoryItemDetail = (props: IRobotRunHistoryItemDetailProps
               nodeDetail={nodeDetail}
             >
               {isTrigger ? (
-                <RobotRunHistoryTriggerDetail nodeType={nodeType} nodeDetail={nodeDetail}/>
+                <RobotRunHistoryTriggerDetail nodeType={nodeType} nodeDetail={nodeDetail} />
               ) : (
-                <RobotRunHistoryActionDetail nodeType={nodeType} nodeDetail={nodeDetail}/>
+                <RobotRunHistoryActionDetail nodeType={nodeType} nodeDetail={nodeDetail} />
               )}
             </RobotRunHistoryNodeWrapper>
           );

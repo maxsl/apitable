@@ -61,7 +61,7 @@ const ObjectField = (props: IFieldProps) => {
         type: 'Expression',
         value: {
           operator: 'newObject',
-          operands: objectCombOperand([...transObject.value.operands, name, value]),
+          operands: objectCombOperand([...(transObject.value?.operands ?? []), name, value]),
         },
       };
       // console.log('onPropertyChange', _newFormData);

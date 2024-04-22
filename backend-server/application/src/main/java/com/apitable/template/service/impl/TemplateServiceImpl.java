@@ -213,6 +213,8 @@ public class TemplateServiceImpl
                 iAutomationRobotService.checkAutomationReference(singletonNodeIds,
                     singletonNodeIds);
                 break;
+            case CUSTOM_PAGE:
+                break;
             default:
                 throw new BusinessException(NOT_ALLOW);
         }

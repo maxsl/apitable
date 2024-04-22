@@ -188,6 +188,7 @@ test-ut-room-docker:
 		-e MYSQL_HOST=test-mysql \
 		-e REDIS_HOST=test-redis \
 		-e RABBITMQ_HOST=test-rabbitmq \
+		-e TZ=UTC \
 		unit-test-room pnpm run test:ut:room:cov
 	@echo "${GREEN}finished unit test, clean up images...${RESET}"
 

@@ -48,6 +48,7 @@ const fixInnerConsistency = (datasheetId: string, errors: IInnerConsistencyError
 
   fixConsistencyMetadata = null;
   console.log('Fix inner consistency changesets', ops);
+
   resourceService.instance!.operationExecuted(ops);
 
   Sentry.captureMessage('fixInnerConsistency: Inner data inconsistency of datasheet found and attempts made to fix', {

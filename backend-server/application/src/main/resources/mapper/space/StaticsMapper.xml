@@ -50,14 +50,11 @@
           and is_rubbish = 0
     </select>
 
-    <select id="countRecordsBySpaceId" resultType="java.lang.Long">
-        SELECT SUM(JSON_LENGTH(vdm.meta_data -> '$.views[0].rows'))
-        FROM ${tablePrefix}datasheet_meta vdm,
-             ${tablePrefix}datasheet vd
-        WHERE vdm.dst_id = vd.dst_id
-          AND vdm.is_deleted = 0
-          AND vd.is_deleted = 0
-          AND vd.space_id = #{spaceId}
+    <select id="countRecordsBySpaceId" resultType="java.lang.String">
+        SELECT meta_data -> '$.views[0].rows[*].recordId'
+        FROM ${tablePrefix}datasheet_meta vdm
+        WHERE exists(SELECT 1 FROM ${tablePrefix}datasheet vd WHERE vd.dst_id = vdm.dst_id AND vd.space_id = #{spaceId}
+        AND vd.is_deleted = 0)
     </select>
 
     <select id="countApiUsageBySpaceId" resultType="java.lang.Long">

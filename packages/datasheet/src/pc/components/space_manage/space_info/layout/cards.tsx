@@ -179,7 +179,7 @@ export const useCards = (props: ILayoutProps) => {
 
       FileCard: (props: ICardProps) => {
         const titleLink =
-          basicCert || isSocial || isMobileApp() || isMobile || getEnvVariables().IS_SELFHOST || getEnvVariables().IS_APITABLE
+          basicCert || isMobileApp() || isMobile || getEnvVariables().IS_SELFHOST
             ? undefined
             : {
               text: t(Strings.attachment_capacity_details_entry),

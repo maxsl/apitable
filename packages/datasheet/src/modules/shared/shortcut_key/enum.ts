@@ -29,6 +29,7 @@ export enum ContextName {
   recordEditable = 'recordEditable', // Record Record Editing
   modalVisible = 'modalVisible', // Is the modal window currently open
   isQuickSearchExpanding = 'isQuickSearchExpanding', // quick search is expanding
+  isWorkdocOpen = 'isWorkdocOpen', // Workdoc is open
 }
 
 export enum ShortcutActionName {

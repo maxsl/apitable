@@ -29,6 +29,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.apitable.automation.entity.AutomationRobotEntity;
 import com.apitable.automation.entity.AutomationTriggerEntity;
 import com.apitable.automation.enums.AutomationTriggerType;
 import com.apitable.automation.mapper.AutomationTriggerMapper;
@@ -183,6 +184,20 @@ public class AutomationTriggerServiceImpl implements IAutomationTriggerService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteByTriggerId(String robotId, String triggerId, Long userId) {
+        AutomationTriggerEntity trigger = triggerMapper.selectByTriggerId(triggerId);
+        ExceptionUtil.isNotNull(trigger, AUTOMATION_TRIGGER_NOT_EXIST);
+        String scheduleTriggerTypeId = iAutomationTriggerTypeService.getTriggerTypeByEndpoint(
+            AutomationTriggerType.SCHEDULED_TIME_ARRIVE.getType());
+        if (trigger.getTriggerTypeId().equals(scheduleTriggerTypeId)) {
+            automationServiceFacade.deleteSchedule(triggerId, userId);
+        }
+        triggerMapper.deleteById(trigger.getId());
+        iAutomationRobotService.updateUpdaterByRobotId(robotId, userId);
+    }
+
+    @Override
     public TriggerCopyResultDto copy(Long userId, AutomationCopyOptions options,
                                      Map<String, String> newRobotMap,
                                      Map<String, String> newNodeMap) {
@@ -249,6 +264,11 @@ public class AutomationTriggerServiceImpl implements IAutomationTriggerService {
     public void updateInputByRobotIdsAndTriggerTypeIds(List<String> robotIds, String triggerTypeId,
                                                        String input) {
         triggerMapper.updateTriggerInputByRobotIdsAndTriggerType(robotIds, triggerTypeId, input);
+    }
+
+    @Override
+    public List<String> getRobotIdsByResourceIds(List<String> nodeIds) {
+        return triggerMapper.selectRobotIdByResourceIds(nodeIds);
     }
 
     private List<TriggerVO> handleTriggerResponse(List<AutomationTriggerSO> data) {

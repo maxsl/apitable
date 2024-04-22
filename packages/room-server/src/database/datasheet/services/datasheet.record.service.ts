@@ -16,49 +16,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  Field,
-  FieldType,
-  IMeta,
-  IRecord,
-  IRecordMap,
-  IReduxState,
-} from '@apitable/core';
+import { Field, FieldType, IMeta, IRecord, IRecordMap, IReduxState } from '@apitable/core';
 import { Span } from '@metinseylan/nestjs-opentelemetry';
 import { Injectable } from '@nestjs/common';
+import { dbQueryBatchSize } from 'app.environment';
+import { DatasheetMetaRepository } from 'database/datasheet/repositories/datasheet.meta.repository';
 import { get, isEmpty, keyBy, orderBy } from 'lodash';
 import { Store } from 'redux';
 import { RecordHistoryTypeEnum } from 'shared/enums/record.history.enum';
-import { UnitInfoDto } from '../../../unit/dtos/unit.info.dto';
-import { DatasheetRecordRepository } from '../repositories/datasheet.record.repository';
+import { DBHelper } from 'shared/helpers';
+import { IApiPaginateRo, IPaginateInfo } from 'shared/interfaces';
+import { UnitInfoDto } from 'unit/dtos/unit.info.dto';
+import { UserService } from 'user/services/user.service';
+import { ArchivedRecord } from '../../interfaces';
 import { ChangesetBaseDto } from '../dtos/changeset.base.dto';
 import { CommentEmojiDto } from '../dtos/comment.emoji.dto';
 import { RecordHistoryDto } from '../dtos/record.history.dto';
 import { DatasheetRecordEntity } from '../entities/datasheet.record.entity';
+import { DatasheetRecordArchiveRepository } from '../repositories/datasheet.record.archive.repository';
+import { DatasheetRecordRepository } from '../repositories/datasheet.record.repository';
 import { RecordHistoryQueryRo } from '../ros/record.history.query.ro';
 import { DatasheetChangesetService } from './datasheet.changeset.service';
 import { RecordCommentService } from './record.comment.service';
-import {
-  DatasheetRecordArchiveRepository,
-} from '../repositories/datasheet.record.archive.repository';
-import { IApiPaginateRo, IPaginateInfo } from 'shared/interfaces';
-import { ArchivedRecord } from '../../interfaces';
-import { UserService } from '../../../user/services/user.service';
-import { DBHelper } from 'shared/helpers';
 
 @Injectable()
 export class DatasheetRecordService {
   constructor(
     private readonly recordRepo: DatasheetRecordRepository,
+    private readonly datasheetMeta: DatasheetMetaRepository,
     private readonly recordArchiveRepo: DatasheetRecordArchiveRepository,
     private readonly recordCommentService: RecordCommentService,
     private readonly datasheetChangesetService: DatasheetChangesetService,
     private readonly userService: UserService,
-  ) {
-  }
+  ) {}
 
   @Span()
   async getRecordsByDstId(dstId: string, includeCommentCount = true, includeArchivedRecords = false): Promise<IRecordMap> {
+    if (includeArchivedRecords) {
+      return await this.getAllRecordsByDstId(dstId, includeCommentCount);
+    }
+    return await this.getUnarchivedRecordsByDstId(dstId, includeCommentCount);
+  }
+
+  /**
+   * get all records including the archived records. only used in subscription.
+   * @param dstId
+   * @param includeCommentCount
+   */
+  @Span()
+  async getAllRecordsByDstId(dstId: string, includeCommentCount = true): Promise<IRecordMap> {
     // We do not expect to query all the records of dstId at once,
     // which will cause excessive memory usage. We expect to use paging to load the records of dstId.
     const counts = await this.recordRepo.count({ dstId, isDeleted: false });
@@ -79,27 +85,34 @@ export class DatasheetRecordService {
     if (includeCommentCount) {
       commentCountMap = await this.recordCommentService.getCommentCountMapByDstId(dstId);
     }
-    if (!includeArchivedRecords) {
-      const archivedRecordIds = await this.recordArchiveRepo.getArchivedRecordIdsByDstId(dstId);
-      if (archivedRecordIds && archivedRecordIds.size > 0) {
-        records = records.filter(record => !archivedRecordIds.has(record.recordId));
-      }
-    }
-
     return this.formatRecordMap(records, commentCountMap);
   }
 
+  /**
+   * only query the table records. resolve slow sql.
+   * @param dstId
+   * @param includeCommentCount
+   */
+  @Span()
+  async getUnarchivedRecordsByDstId(dstId: string, includeCommentCount = true): Promise<IRecordMap> {
+    // get count from metadata more efficient
+    const recordIds: string[] = await this.datasheetMeta.selectRecordIdsByDstId(dstId);
+    return this.getRecordsByDstIdAndRecordIds(dstId, recordIds, false, includeCommentCount, false, dbQueryBatchSize);
+  }
+
   async batchSave(records: any[]) {
-    return await this.recordRepo
-      .createQueryBuilder()
-      .insert()
-      .values(records)
-      .execute();
+    return await this.recordRepo.createQueryBuilder().insert().values(records).execute();
   }
 
   @Span()
-  async getRecordsByDstIdAndRecordIds(dstId: string, recordIds: string[], isDeleted = false, includeCommentCount = true,
-    includeArchivedRecords = false): Promise<IRecordMap> {
+  async getRecordsByDstIdAndRecordIds(
+    dstId: string,
+    recordIds: string[],
+    isDeleted = false,
+    includeCommentCount = true,
+    includeArchivedRecords = false,
+    batchSize?: number,
+  ): Promise<IRecordMap> {
     if (recordIds && recordIds.length === 0) {
       return {};
     }
@@ -108,6 +121,7 @@ export class DatasheetRecordService {
       ['recordId', 'data', 'revisionHistory', 'createdAt', 'updatedAt', 'recordMeta'],
       recordIds,
       { dstId, isDeleted },
+      batchSize,
     );
     let commentCountMap = {};
     if (includeCommentCount) {
@@ -116,7 +130,7 @@ export class DatasheetRecordService {
     if (!includeArchivedRecords) {
       const archivedRecordIds = await this.recordArchiveRepo.getArchivedRecordIdsByDstIdAndRecordIds(dstId, recordIds);
       if (archivedRecordIds && archivedRecordIds.size > 0) {
-        records = records.filter(record => !archivedRecordIds.has(record.recordId));
+        records = records.filter((record) => !archivedRecordIds.has(record.recordId));
       }
     }
 
@@ -125,105 +139,32 @@ export class DatasheetRecordService {
 
   @Span()
   async getBasicRecordsByRecordIds(dstId: string, recordIds: string[], isDeleted = false, includeArchivedRecords = false): Promise<IRecordMap> {
-    let records = await DBHelper.batchQueryByRecordIdIn(
-      this.recordRepo,
-      ['recordId', 'data', 'createdAt', 'updatedAt', 'recordMeta'],
-      recordIds,
-      { dstId, isDeleted },
-    );
+    let records = await DBHelper.batchQueryByRecordIdIn(this.recordRepo, ['recordId', 'data', 'createdAt', 'updatedAt', 'recordMeta'], recordIds, {
+      dstId,
+      isDeleted,
+    });
     if (!includeArchivedRecords) {
       const archivedRecordIds = await this.recordArchiveRepo.getArchivedRecordIdsByDstIdAndRecordIds(dstId, recordIds);
       if (archivedRecordIds && archivedRecordIds.size > 0) {
-        records = records.filter(record => !archivedRecordIds.has(record.recordId));
+        records = records.filter((record) => !archivedRecordIds.has(record.recordId));
       }
     }
     return this.formatRecordMap(records, {}, recordIds);
   }
 
-  @Span()
-  private formatRecordMap(records: DatasheetRecordEntity[], commentCountMap: {
-    [key: string]: number
-  }, recordIds?: string[]): IRecordMap {
-    if (recordIds) {
-      // recordMap follows the order of 'records'
-      const recordMap = keyBy(records, 'recordId');
-      return recordIds.reduce<IRecordMap>((pre, cur) => {
-        const record = recordMap[cur];
-        if (record) {
-          pre[cur] = {
-            id: cur,
-            data: record.data || {},
-            createdAt: Date.parse(record.createdAt.toString()),
-            updatedAt: record.updatedAt ? new Date(record.updatedAt).valueOf() : undefined,
-            revisionHistory: record.revisionHistory?.split(',').map(x => Number(x)),
-            recordMeta: record.recordMeta,
-            commentCount: commentCountMap[cur] || 0,
-          };
-        }
-        return pre;
-      }, {});
-    }
-    return records.reduce<IRecordMap>((pre, cur) => {
-      if (!cur.recordId) {
-        return pre;
-      }
-      pre[cur.recordId] = {
-        id: cur.recordId,
-        data: cur.data || {},
-        createdAt: Date.parse(cur.createdAt.toString()),
-        updatedAt: cur.updatedAt ? new Date(cur.updatedAt).valueOf() : undefined,
-        revisionHistory: cur.revisionHistory?.split(',').map(x => Number(x)),
-        recordMeta: cur.recordMeta,
-        commentCount: commentCountMap[cur.recordId] || 0,
-      };
-      return pre;
-    }, {});
-  }
-
   async getIdsByDstIdAndRecordIds(dstId: string, recordIds: string[], includeArchivedRecords = false): Promise<string[] | null> {
-    const records = await DBHelper.batchQueryByRecordIdIn(
-      this.recordRepo,
-      ['recordId'],
-      recordIds,
-      { dstId, isDeleted: false },
-    );
-    let dbRecordIds = records.map(entity => entity.recordId);
+    const records = await DBHelper.batchQueryByRecordIdIn(this.recordRepo, ['recordId'], recordIds, { dstId, isDeleted: false });
+    let dbRecordIds = records.map((entity) => entity.recordId);
     if (!dbRecordIds) {
       return dbRecordIds;
     }
     if (!includeArchivedRecords) {
       const archivedRecordIds = await this.recordArchiveRepo.getArchivedRecordIdsByDstIdAndRecordIds(dstId, dbRecordIds);
       if (archivedRecordIds && archivedRecordIds.size > 0) {
-        dbRecordIds = dbRecordIds.filter(record => !archivedRecordIds.has(record));
+        dbRecordIds = dbRecordIds.filter((record) => !archivedRecordIds.has(record));
       }
     }
     return dbRecordIds;
-  }
-
-  async getArchivedIdsByDstIdAndRecordIds(dstId: string, recordIds: string[]): Promise<Set<String>> {
-    return await this.recordArchiveRepo.getArchivedRecordIdsByDstIdAndRecordIds(dstId, recordIds);
-  }
-
-  async getBaseRecordMap(dstId: string, includeCommentCount = false, ignoreDeleted = false, loadRecordMeta = false): Promise<IRecordMap> {
-    const records = ignoreDeleted
-      ? await this.recordRepo.selectRecordsDataByDstIdIgnoreDeleted(dstId)
-      : await this.recordRepo.selectRecordsDataByDstId(dstId);
-    const commentCountMap = includeCommentCount ? await this.recordCommentService.getCommentCountMapByDstId(dstId) : null;
-    if (!records) {
-      return {};
-    }
-    return records.reduce<IRecordMap>((pre, cur) => {
-      pre[cur.recordId] = {
-        id: cur.recordId,
-        data: cur.data!,
-        commentCount: commentCountMap && commentCountMap[cur.recordId] ? commentCountMap[cur.recordId]! : 0,
-      };
-      const record = pre[cur.recordId];
-      if (loadRecordMeta && record) {
-        record.recordMeta = cur.recordMeta;
-      }
-      return pre;
-    }, {});
   }
 
   /**
@@ -285,11 +226,11 @@ export class DatasheetRecordService {
     // reduce queried data size
     const mentionedRevisions: number[] = [];
     const replyCommentIds: Set<string> = new Set();
-    changesets = changesets.map(item => {
+    changesets = changesets.map((item) => {
       if (item.isComment) {
         mentionedRevisions.push(Number(item.revision));
         const replyComment: {
-          commentId?: string
+          commentId?: string;
         } = get(item, 'operations.0.actions.0.li.commentMsg.reply') as unknown as { commentId?: string };
         if (replyComment && !isEmpty(replyComment) && replyComment.commentId) {
           // record replied comment ID
@@ -305,6 +246,40 @@ export class DatasheetRecordService {
     }
     const commentReplyMap = await this.getCommentReplyMap(dstId, recordId, Array.from(replyCommentIds));
     return { changesets, units, emojis, commentReplyMap };
+  }
+
+  async getArchivedIdsByDstIdAndRecordIds(dstId: string, recordIds: string[]): Promise<Set<String>> {
+    return await this.recordArchiveRepo.getArchivedRecordIdsByDstIdAndRecordIds(dstId, recordIds);
+  }
+
+  async getBaseRecordMap(dstId: string, includeCommentCount = false, ignoreDeleted = false, loadRecordMeta = false): Promise<IRecordMap> {
+    const records = ignoreDeleted
+      ? await this.recordRepo.selectRecordsDataByDstIdIgnoreDeleted(dstId)
+      : await this.recordRepo.selectRecordsDataByDstId(dstId);
+    const commentCountMap = includeCommentCount ? await this.recordCommentService.getCommentCountMapByDstId(dstId) : null;
+    if (!records) {
+      return {};
+    }
+    return records.reduce<IRecordMap>((pre, cur) => {
+      pre[cur.recordId] = {
+        id: cur.recordId,
+        data: cur.data!,
+        commentCount: commentCountMap && commentCountMap[cur.recordId] ? commentCountMap[cur.recordId]! : 0,
+      };
+      const record = pre[cur.recordId];
+      if (loadRecordMeta && record) {
+        record.recordMeta = cur.recordMeta;
+      }
+      return pre;
+    }, {});
+  }
+
+  async getDeletedRecordsByDstId(dstId: string): Promise<string[]> {
+    const records = await this.recordRepo.find({
+      select: ['recordId'],
+      where: { dstId, isDeleted: true },
+    });
+    return records.map((record) => record.recordId);
   }
 
   /**
@@ -327,53 +302,38 @@ export class DatasheetRecordService {
     }, {});
   }
 
-  /**
-   * Obtain record revisions in ascending order of revisions
-   *
-   * @param dstId datasheet ID
-   * @param recordId record ID
-   * @param type record history type
-   * @param showRecordHistory if record change history is shown
-   * @param limitDays limit days
-   * @return string[]
-   * @author Zoe Zheng
-   * @date 2021/4/12 11:48 AM
-   */
-  private async getRecordRevisionHistoryAsc(
-    dstId: string,
-    recordId: string,
-    type: RecordHistoryTypeEnum,
-    showRecordHistory = true,
-    limitDays?: number,
-  ): Promise<string[]> {
-    if (type == RecordHistoryTypeEnum.MODIFY_HISTORY && showRecordHistory) {
-      const result: {
-        revisionHistory: string
-      } | undefined = await this.recordRepo.selectRevisionHistoryByDstIdAndRecordId(dstId, recordId);
-      if (result && result.revisionHistory) {
-        const revisions = result.revisionHistory.split(',');
-        if (limitDays) {
-          return this.datasheetChangesetService.getRecordModifyRevisions(dstId, revisions, limitDays);
-        }
-        return revisions;
-      }
+  async getArchivedRecords(dstId: string, query: IApiPaginateRo): Promise<IPaginateInfo<ArchivedRecord[]>> {
+    const total = await this.recordArchiveRepo.countRowsByDstId(dstId);
+    let { pageSize, pageNum } = query;
+    pageSize = pageSize || 10;
+    pageNum = pageNum || 1;
+    if (total === 0) {
+      return { total, pageSize: pageSize, pageNum: pageNum, records: [] };
     }
-    if (type == RecordHistoryTypeEnum.COMMENT) {
-      return await this.recordCommentService.getRecordCommentRevisions(dstId, recordId);
+    const offset = (pageNum - 1) * pageSize;
+
+    const recordArchiveEntities = await this.recordArchiveRepo.getArchivedRecords(dstId, pageSize, offset);
+
+    const recordIds = recordArchiveEntities.map((record) => record.recordId);
+    const userIds = recordArchiveEntities.map((record) => record.archivedBy);
+    const recordMap = await this.getRecordsByDstIdAndRecordIds(dstId, recordIds, false, true, true);
+    const userMap = await this.userService.getUserBaseInfoMapByUserIds(userIds as any[]);
+    const resultData: ArchivedRecord[] = [];
+    for (const recordEntity of recordArchiveEntities) {
+      const user = userMap.get(recordEntity.archivedBy);
+      const recordInfo = recordMap[recordEntity.recordId];
+      resultData.push({
+        record: recordInfo,
+        archivedUser: user,
+        archivedAt: recordEntity.archivedAt.getTime(),
+      });
     }
-    if (type == RecordHistoryTypeEnum.ALL) {
-      const modifyRevisions = await this.getRecordRevisionHistoryAsc(
-        dstId,
-        recordId,
-        RecordHistoryTypeEnum.MODIFY_HISTORY,
-        showRecordHistory,
-        limitDays,
-      );
-      const commentRevisions = await this.recordCommentService.getRecordCommentRevisions(dstId, recordId);
-      modifyRevisions.push(...commentRevisions);
-      return modifyRevisions.sort((a, b) => Number(a) - Number(b));
-    }
-    return [];
+    return {
+      total,
+      pageSize,
+      pageNum,
+      records: resultData,
+    };
   }
 
   async getLinkRecordIdsByRecordIdAndFieldId(dstId: string, recordId: string, fieldId: string) {
@@ -404,45 +364,98 @@ export class DatasheetRecordService {
     return await this.recordArchiveRepo.countRowsByDstId(dstId);
   }
 
-  async getDeletedRecordsByDstId(dstId: string): Promise<string[]>{
-    const records = await this.recordRepo.find({
-      select: ['recordId'],
-      where: {dstId, isDeleted: true},
-    });
-    return records.map(record => record.recordId);
+  @Span()
+  private formatRecordMap(
+    records: DatasheetRecordEntity[],
+    commentCountMap: {
+      [key: string]: number;
+    },
+    recordIds?: string[],
+  ): IRecordMap {
+    if (recordIds) {
+      // recordMap follows the order of 'records'
+      const recordMap = keyBy(records, 'recordId');
+      return recordIds.reduce<IRecordMap>((pre, cur) => {
+        const record = recordMap[cur];
+        if (record) {
+          pre[cur] = {
+            id: cur,
+            data: record.data || {},
+            createdAt: Date.parse(record.createdAt.toString()),
+            updatedAt: record.updatedAt ? new Date(record.updatedAt).valueOf() : undefined,
+            revisionHistory: record.revisionHistory?.split(',').map((x) => Number(x)),
+            recordMeta: record.recordMeta,
+            commentCount: commentCountMap[cur] || 0,
+          };
+        }
+        return pre;
+      }, {});
+    }
+    return records.reduce<IRecordMap>((pre, cur) => {
+      if (!cur.recordId) {
+        return pre;
+      }
+      pre[cur.recordId] = {
+        id: cur.recordId,
+        data: cur.data || {},
+        createdAt: Date.parse(cur.createdAt.toString()),
+        updatedAt: cur.updatedAt ? new Date(cur.updatedAt).valueOf() : undefined,
+        revisionHistory: cur.revisionHistory?.split(',').map((x) => Number(x)),
+        recordMeta: cur.recordMeta,
+        commentCount: commentCountMap[cur.recordId] || 0,
+      };
+      return pre;
+    }, {});
   }
 
-  async getArchivedRecords(dstId: string, query: IApiPaginateRo): Promise<IPaginateInfo<ArchivedRecord[]>> {
-    const total = await this.recordArchiveRepo.countRowsByDstId(dstId);
-    let { pageSize, pageNum } = query;
-    pageSize = pageSize || 10;
-    pageNum = pageNum || 1;
-    if (total === 0) {
-      return { total, pageSize: pageSize, pageNum: pageNum, records: [] };
+  /**
+   * Obtain record revisions in ascending order of revisions
+   *
+   * @param dstId datasheet ID
+   * @param recordId record ID
+   * @param type record history type
+   * @param showRecordHistory if record change history is shown
+   * @param limitDays limit days
+   * @return string[]
+   * @author Zoe Zheng
+   * @date 2021/4/12 11:48 AM
+   */
+  private async getRecordRevisionHistoryAsc(
+    dstId: string,
+    recordId: string,
+    type: RecordHistoryTypeEnum,
+    showRecordHistory = true,
+    limitDays?: number,
+  ): Promise<string[]> {
+    if (type == RecordHistoryTypeEnum.MODIFY_HISTORY && showRecordHistory) {
+      const result:
+        | {
+            revisionHistory: string;
+          }
+        | undefined = await this.recordRepo.selectRevisionHistoryByDstIdAndRecordId(dstId, recordId);
+      if (result && result.revisionHistory) {
+        const revisions = result.revisionHistory.split(',');
+        if (limitDays) {
+          return this.datasheetChangesetService.getRecordModifyRevisions(dstId, revisions, limitDays);
+        }
+        return revisions;
+      }
     }
-    const offset = (pageNum - 1) * pageSize;
-
-    const recordArchiveEntities = await this.recordArchiveRepo.getArchivedRecords(dstId, pageSize, offset);
-
-    const recordIds = recordArchiveEntities.map(record => record.recordId);
-    const userIds = recordArchiveEntities.map(record => record.archivedBy);
-    const recordMap = await this.getRecordsByDstIdAndRecordIds(dstId, recordIds, false, true, true);
-    const userMap = await this.userService.getUserBaseInfoMapByUserIds(userIds as any[]);
-    const resultData: ArchivedRecord[] = [];
-    for (const recordEntity of recordArchiveEntities) {
-      const user = userMap.get(recordEntity.archivedBy);
-      const recordInfo = recordMap[recordEntity.recordId];
-      resultData.push({
-        record: recordInfo,
-        archivedUser: user,
-        archivedAt: recordEntity.archivedAt.getTime(),
-      });
+    if (type == RecordHistoryTypeEnum.COMMENT) {
+      return await this.recordCommentService.getRecordCommentRevisions(dstId, recordId);
     }
-    return {
-      total,
-      pageSize,
-      pageNum,
-      records: resultData,
-    };
+    if (type == RecordHistoryTypeEnum.ALL) {
+      const modifyRevisions = await this.getRecordRevisionHistoryAsc(
+        dstId,
+        recordId,
+        RecordHistoryTypeEnum.MODIFY_HISTORY,
+        showRecordHistory,
+        limitDays,
+      );
+      const commentRevisions = await this.recordCommentService.getRecordCommentRevisions(dstId, recordId);
+      modifyRevisions.push(...commentRevisions);
+      return modifyRevisions.sort((a, b) => Number(a) - Number(b));
+    }
+    return [];
   }
 }

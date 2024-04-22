@@ -20,6 +20,7 @@ package com.apitable.workspace.service.impl;
 
 import static com.apitable.core.constants.RedisConstants.getTemplateQuoteKey;
 import static com.apitable.shared.constants.AssetsPublicConstants.SPACE_PREFIX;
+import static com.apitable.template.enums.TemplateException.NODE_LINK_FOREIGN_NODE;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -1035,8 +1036,12 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, NodeEntity> impleme
                 }
                 // Update the information of this node (the ID of the previous
                 // node may be updated to null, so update By id is not used)
-                baseMapper.updateInfoByNodeId(nodeEntity.getNodeId(), parentId, preNodeId, name,
-                    NumberUtil.parseLong(opRo.getUnitId()));
+                baseMapper.updateInfoByNodeId(nodeEntity.getNodeId(), parentId, preNodeId, name);
+                List<String> subNodeIds = getNodeIdsInNodeTree(nodeEntity.getNodeId(), -1);
+                if (!subNodeIds.isEmpty()) {
+                    baseMapper.updateUnitIdByNodeIds(subNodeIds,
+                        NumberUtil.parseLong(opRo.getUnitId()));
+                }
             } else {
                 throw new BusinessException("Frequent operations");
             }
@@ -1990,11 +1995,17 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, NodeEntity> impleme
 
     @Override
     public void deleteMembersNodes(List<Long> unitIds) {
+        if (unitIds.isEmpty()) {
+            return;
+        }
         baseMapper.updateIsDeletedByUnitIds(unitIds, true);
     }
 
     @Override
     public void restoreMembersNodes(List<Long> unitIds) {
+        if (unitIds.isEmpty()) {
+            return;
+        }
         baseMapper.updateIsDeletedByUnitIds(unitIds, false);
     }
 
@@ -2030,6 +2041,40 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, NodeEntity> impleme
         Long memberId = getMemberIdByUserIdAndNodeId(userId, nodeId);
         Long unitId = iUnitService.getUnitIdByRefId(memberId);
         return nodeUnit.equals(unitId);
+    }
+
+    @Override
+    public boolean linkByOutsideWidgets(List<String> nodeIds) {
+        List<String> widgetIds = iWidgetService.getNodeWidgetIds(nodeIds);
+        if (!widgetIds.isEmpty()) {
+            List<String> resourceIds = iWidgetService.getWidgetNodeIds(widgetIds);
+            if (!resourceIds.isEmpty()) {
+                resourceIds = getExistNodeIdsBySelf(resourceIds);
+                return !new HashSet<>(nodeIds).containsAll(resourceIds);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void linkByOutsideResource(String nodeId) {
+        List<String> nodeIds = new ArrayList<>();
+        if (nodeId.startsWith(IdRulePrefixEnum.FOD.getIdRulePrefixEnum())) {
+            nodeIds = getNodeIdsInNodeTree(nodeId, -1);
+        }
+        if (nodeId.startsWith(IdRulePrefixEnum.DST.getIdRulePrefixEnum())) {
+            nodeIds.add(nodeId);
+        }
+        if (nodeIds.isEmpty()) {
+            return;
+        }
+        // check mirror
+        ExceptionUtil.isTrue(iNodeRelService.relInTheSameFolder(nodeIds), NODE_LINK_FOREIGN_NODE);
+        // check widgets
+        ExceptionUtil.isFalse(linkByOutsideWidgets(nodeIds), NODE_LINK_FOREIGN_NODE);
+        // check automation
+        ExceptionUtil.isFalse(iAutomationRobotService.linkByOutsideAutomation(nodeIds),
+            NODE_LINK_FOREIGN_NODE);
     }
 
     private List<NodeSearchResult> formatNodeSearchResults(List<NodeInfoVo> nodeInfoList) {

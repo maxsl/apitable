@@ -20,6 +20,7 @@ package com.apitable.internal.controller;
 
 import static com.apitable.workspace.enums.PermissionException.NODE_ACCESS_DENIED;
 
+import cn.hutool.core.util.StrUtil;
 import com.apitable.control.annotation.ThirdPartControl;
 import com.apitable.core.exception.BusinessException;
 import com.apitable.core.support.ResponseData;
@@ -87,7 +88,8 @@ public class InternalNodePermissionController {
         @RequestParam(value = "shareId", required = false) String shareId) {
         Long userId = SessionContext.getUserId();
         // check private
-        if (!iNodeService.getIsTemplateByNodeIds(Collections.singletonList(nodeId))
+        if (StrUtil.isBlank(shareId)
+            && !iNodeService.getIsTemplateByNodeIds(Collections.singletonList(nodeId))
             && !iNodeService.privateNodeOperation(userId, nodeId)) {
             throw new BusinessException(NODE_ACCESS_DENIED);
         }

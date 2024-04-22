@@ -1535,17 +1535,23 @@ public class MemberServiceImpl extends ExpandServiceImpl<MemberMapper, MemberEnt
         Map<Long, Long> memberUnitMap =
             iUnitService.getUnitBaseInfoByRefIds(memberIds).stream().collect(
                 Collectors.toMap(UnitBaseInfoDTO::getUnitRefId, UnitBaseInfoDTO::getId));
-        for (MemberDTO member : members) {
+        Map<Long, MemberDTO> userMemberMap =
+            members.stream().collect(Collectors.toMap(MemberDTO::getUserId, i -> i));
+        // maybe member doesn't bind any user.
+        for (Long userId : userIds) {
             UnitMemberTeamDTO unitMember = new UnitMemberTeamDTO();
-            unitMember.setOpenId(member.getOpenId());
-            unitMember.setIsDeleted(member.getIsDeleted());
-            unitMember.setMemberId(member.getId());
-            unitMember.setMemberName(member.getMemberName());
-            unitMember.setUnitId(memberUnitMap.get(member.getId()));
-            String teamName = StrUtil.join(" & ", memberTeamMap.get(member.getId()));
-            unitMember.setTeamName(teamName);
-            UserEntity user = users.get(member.getUserId());
-            unitMember.setUserId(member.getUserId());
+            MemberDTO member = userMemberMap.get(userId);
+            if (null != member) {
+                unitMember.setOpenId(member.getOpenId());
+                unitMember.setDeleted(member.getIsDeleted());
+                unitMember.setMemberId(member.getId());
+                unitMember.setMemberName(member.getMemberName());
+                unitMember.setUnitId(memberUnitMap.get(member.getId()));
+                String teamName = StrUtil.join(" & ", memberTeamMap.get(member.getId()));
+                unitMember.setTeamName(teamName);
+            }
+            UserEntity user = users.get(userId);
+            unitMember.setUserId(userId);
             unitMember.setAvatar(user.getAvatar());
             unitMember.setAvatarColor(user.getColor());
             unitMembers.add(unitMember);

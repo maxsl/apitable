@@ -19,7 +19,7 @@
 import cx from 'classnames';
 import produce from 'immer';
 import { useAtom } from 'jotai';
-import { isEqual, isString } from 'lodash';
+import { identity, isEqual, isEqualWith, isNil, isString, pickBy } from 'lodash';
 import * as React from 'react';
 import { FC, memo, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -58,6 +58,20 @@ export interface IRobotActionProps {
   editType?: EditType;
 }
 
+export const customizer = (objValue, othValue) => {
+  if (isNil(objValue) && isNil(othValue)) {
+    return true;
+  }
+  if(objValue === '******' || othValue === '******') {
+    return true;
+  }
+  const l = pickBy(objValue, identity);
+  const r = pickBy(othValue, identity);
+  if (isEqual(l, r)) {
+    return true;
+  }
+  return undefined;
+};
 export const RobotAction = memo((props: IRobotActionProps) => {
   const { editType, action, robotId, index = 0 } = props;
   const permissions = useAutomationResourcePermission();
@@ -217,7 +231,7 @@ export const RobotAction = memo((props: IRobotActionProps) => {
 
   const mapFormData = map.get(action.id!);
   const modified = useMemo(() => {
-    return mapFormData != null && !isEqual(action.input, mapFormData);
+    return mapFormData != null && !isEqualWith(action.input, mapFormData, customizer);
   }, [mapFormData, action.input]);
   const handleUpdate = useCallback(
     (e: IChangeEvent) => {

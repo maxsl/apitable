@@ -286,7 +286,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
 
     @Override
     public List<Long> getRoleIdsByUnitIds(String spaceId, List<String> unitIds) {
-        if (unitIds.isEmpty()) {
+        if (CollUtil.isEmpty(unitIds)) {
             return new ArrayList<>();
         }
         return iUnitService.getUnitBaseInfoBySpaceIdAndUnitTypeAndUnitIds(spaceId, UnitType.ROLE,

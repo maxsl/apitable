@@ -492,4 +492,12 @@ public interface ISpaceService extends IService<SpaceEntity> {
      */
     String getSocialSuiteKeyByAppId(String appId);
 
+    /**
+     * check whether the space bind with a social connector.
+     *
+     * @param spaceId space id
+     * @return boolean
+     */
+    boolean checkSocialBind(String spaceId);
+
 }

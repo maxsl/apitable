@@ -18,12 +18,12 @@
 
 import { useKeyPress } from 'ahooks';
 import classNames from 'classnames';
+import { ShortcutActionManager, ShortcutActionName } from 'modules/shared/shortcut_key';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
 import { useThemeColors } from '@apitable/components';
 import { Selectors, StoreActions, Strings, t, ViewType } from '@apitable/core';
 import { SearchOutlined } from '@apitable/icons';
-import { ShortcutActionManager, ShortcutActionName } from 'modules/shared/shortcut_key';
 import { expandRecordIdNavigate } from 'pc/components/expand_record';
 import { store } from 'pc/store';
 import { useAppSelector } from 'pc/store/react-redux';

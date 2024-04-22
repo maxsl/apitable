@@ -100,4 +100,14 @@
         WHERE trigger_id = #{triggerId}
         AND is_deleted = 0
     </select>
+
+    <select id="selectRobotIdByResourceIds" resultType="java.lang.String">
+        SELECT DISTINCT robot_id
+        FROM ${tablePrefix}automation_trigger
+        WHERE resource_id IN
+        <foreach item="item" index="index" collection="resourceIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND is_deleted = 0
+    </select>
 </mapper>

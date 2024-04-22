@@ -258,6 +258,7 @@ export const TreeViewBase: React.ForwardRefRenderFunction<ITreeViewRef, ITreeVie
                     link: (
                       <LinkButton
                         href={t(Strings.private_help_link)}
+                        target='_blank'
                       >
                         {t(Strings.know_more)}
                       </LinkButton>

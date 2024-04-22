@@ -17,6 +17,7 @@
  */
 
 import { isEmpty } from 'lodash';
+import { ContextName, ShortcutActionName } from 'modules/shared/shortcut_key/enum';
 import {
   CollaCommandName,
   ConfigConstant,
@@ -29,7 +30,6 @@ import {
   Strings,
   t,
 } from '@apitable/core';
-import { ContextName, ShortcutActionName } from 'modules/shared/shortcut_key/enum';
 import { Message } from 'pc/components/common/message/message';
 import { notify } from 'pc/components/common/notify/notify';
 import { NotifyKey } from 'pc/components/common/notify/notify.interface';
@@ -81,6 +81,12 @@ export class ShortcutContext {
       // Handling of table and expanded card shortcuts conflicts when cards are considered unexpanded in side mode
       if (state.space.isSideRecordOpen) return false;
       return Boolean(document.querySelectorAll(`.${EXPAND_RECORD}`).length);
+    },
+    [ContextName.isWorkdocOpen]: () => {
+      const query = string2Query();
+      const recordId = query.recordId as string | undefined;
+      const fieldId = query.fieldId as string | undefined;
+      return Boolean(recordId && fieldId);
     },
     [ContextName['true']]: () => true,
     [ContextName.isFocusing]: () => {
@@ -278,7 +284,6 @@ export function clear() {
       return;
     }
   }
-  console.log('query', query);
   const fieldMap = Selectors.getFieldMap(state, state.pageParams.datasheetId!);
   const uploadManager = resourceService.instance!.uploadManager;
   const data: ISetRecordOptions[] = [];

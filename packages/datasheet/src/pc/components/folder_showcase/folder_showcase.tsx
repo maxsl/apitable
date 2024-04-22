@@ -19,6 +19,7 @@
 import { useToggle, useUnmount } from 'ahooks';
 import { Spin } from 'antd';
 import classNames from 'classnames';
+import { TriggerCommands } from 'modules/shared/apphook/trigger_commands';
 import Image from 'next/image';
 import * as React from 'react';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
@@ -44,7 +45,6 @@ import {
 } from '@apitable/core';
 import { EditOutlined, MoreOutlined, ShareOutlined } from '@apitable/icons';
 import { uploadAttachToS3, useGetSignatureAssertFunc } from '@apitable/widget-sdk';
-import { TriggerCommands } from 'modules/shared/apphook/trigger_commands';
 import { Share } from 'pc/components/catalog/share';
 import { ButtonPlus, ImageCropUpload, Message } from 'pc/components/common';
 import { ComponentDisplay, ScreenSize } from 'pc/components/common/component_display';
@@ -111,6 +111,8 @@ export const FolderShowcase: FC<React.PropsWithChildren<IFolderShowcaseProps>> =
   const dispatch = useDispatch();
   const { folderId: _folderId, templateId, shareId, categoryId } = useAppSelector((state: IReduxState) => state.pageParams);
   const spaceId = useAppSelector((state) => state.space.activeId);
+  const catalogTreeActiveType = useAppSelector((state) => state.catalogTree.activeType);
+  const isPrivate = catalogTreeActiveType === ConfigConstant.Modules.PRIVATE;
   const { treeNodesMap, socketData } = useAppSelector((state: IReduxState) => state.catalogTree);
   const { getNodeShowcaseReq, updateNodeReq, getChildNodeListReq } = useCatalogTreeRequest();
   const { run: updateNode } = useRequest(updateNodeReq, { manual: true });
@@ -527,7 +529,7 @@ export const FolderShowcase: FC<React.PropsWithChildren<IFolderShowcaseProps>> =
                 icon: makeNodeIconComponent(NodeIcon.Permission),
                 text: t(Strings.permission_setting),
                 onClick: () => dispatch(StoreActions.updatePermissionModalNodeId(nodeInfo.id)),
-                hidden: !permissions.nodeAssignable || !getEnvVariables().FILE_PERMISSION_VISIBLE,
+                hidden: !permissions.nodeAssignable || !getEnvVariables().FILE_PERMISSION_VISIBLE || isPrivate,
               },
               {
                 icon: makeNodeIconComponent(NodeIcon.Template),

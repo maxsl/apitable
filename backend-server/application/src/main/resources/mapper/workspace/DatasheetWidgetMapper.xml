@@ -50,4 +50,13 @@
             </trim>
         </foreach>
     </insert>
+
+    <select id="selectWidgetIdByDstIds" resultType="java.lang.String">
+        SELECT DISTINCT widget_id
+        FROM ${tablePrefix}datasheet_widget
+        WHERE dst_id IN
+        <foreach item="item" index="index" collection="dstIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

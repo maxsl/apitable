@@ -50,6 +50,12 @@ export const RunHistoryDetail = () => {
         end: undefined,
       };
     }
+    if (!nodes) {
+      return {
+        start: undefined,
+        end: undefined,
+      };
+    }
     if (dataItem?.executedNodeIds?.length === 0) {
       return {
         start: undefined,

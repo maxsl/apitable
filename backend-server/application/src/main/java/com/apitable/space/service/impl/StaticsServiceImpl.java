@@ -50,7 +50,6 @@ import com.apitable.space.service.IStaticsService;
 import com.apitable.workspace.dto.NodeStatisticsDTO;
 import com.apitable.workspace.enums.NodeType;
 import com.apitable.workspace.enums.ViewType;
-import com.apitable.workspace.mapper.DatasheetMapper;
 import com.apitable.workspace.mapper.NodeMapper;
 import com.apitable.workspace.service.INodeService;
 import com.apitable.workspace.vo.NodeStatisticsVo;
@@ -91,9 +90,6 @@ public class StaticsServiceImpl implements IStaticsService {
 
     @Resource
     private StaticsMapper staticsMapper;
-
-    @Resource
-    private DatasheetMapper datasheetMapper;
 
     @Resource
     private RedisTemplate<String, Long> redisTemplate;
@@ -265,14 +261,13 @@ public class StaticsServiceImpl implements IStaticsService {
         if (null != recordCount) {
             return recordCount;
         }
-        List<String> dstIds = datasheetMapper.selectDstIdBySpaceId(spaceId);
-        if (CollUtil.isEmpty(dstIds)) {
+        List<String> recordIds = staticsMapper.countRecordsBySpaceId(spaceId);
+        if (CollUtil.isEmpty(recordIds)) {
             return 0L;
         }
         recordCount = 0L;
-        List<List<String>> dstIdList = CollUtil.split(dstIds, 1000);
-        for (List<String> item : dstIdList) {
-            recordCount += SqlTool.retCount(staticsMapper.countRecordsByDstIds(item));
+        for (String item : recordIds) {
+            recordCount += JSONUtil.parseArray(item).size();
         }
         // save in cache
         redisTemplate.opsForValue()
@@ -474,7 +469,8 @@ public class StaticsServiceImpl implements IStaticsService {
             return PageHelper.build(nodes.getCurrent(), nodes.getSize(), nodes.getTotal(), records);
         }
         List<Long> userIds = nodes.getRecords().stream().map(
-            NodeStatisticsDTO::getCreatedBy).filter(userId -> !userId.equals(0L)).toList();
+                NodeStatisticsDTO::getCreatedBy).filter(userId -> !userId.equals(0L)).distinct()
+            .toList();
         List<UnitMemberTeamDTO> members =
             iMemberService.getMemberBySpaceIdAndUserIds(spaceId, userIds);
         Map<Long, UnitMemberTeamDTO> memberMap = members.stream()
@@ -486,7 +482,7 @@ public class StaticsServiceImpl implements IStaticsService {
         for (NodeStatisticsDTO node : nodes.getRecords()) {
             NodeStatisticsVo vo = new NodeStatisticsVo();
             UnitMemberTeamDTO member = memberMap.get(node.getCreatedBy());
-            vo.setMemberId(member.getMemberId().toString());
+            vo.setMemberId(StrUtil.toStringOrNull(member.getMemberId()));
             vo.setMemberName(member.getMemberName());
             vo.setAvatar(member.getAvatar());
             vo.setAvatarColor(member.getAvatarColor());

@@ -32,7 +32,6 @@ import com.apitable.base.enums.DatabaseException;
 import com.apitable.core.exception.BusinessException;
 import com.apitable.core.util.ExceptionUtil;
 import com.apitable.core.util.HttpContextUtil;
-import com.apitable.interfaces.social.facade.SocialServiceFacade;
 import com.apitable.interfaces.user.facade.UserServiceFacade;
 import com.apitable.organization.mapper.TeamMemberRelMapper;
 import com.apitable.organization.service.IMemberService;
@@ -105,9 +104,6 @@ public class SpaceInviteLinkServiceImpl
     private RedisLockRegistry redisLockRegistry;
 
     @Resource
-    private SocialServiceFacade socialServiceFacade;
-
-    @Resource
     private IInvitationService invitationService;
 
     @Override
@@ -118,7 +114,7 @@ public class SpaceInviteLinkServiceImpl
     @Override
     public String saveOrUpdate(String spaceId, Long teamId, Long memberId) {
         // whether a space can create an invitation link
-        boolean isBindSocial = socialServiceFacade.checkSocialBind(spaceId);
+        boolean isBindSocial = iSpaceService.checkSocialBind(spaceId);
         ExceptionUtil.isFalse(isBindSocial, NO_ALLOW_OPERATE);
         String teamSpaceId = iTeamService.getSpaceIdByTeamId(teamId);
         // Verify that the department exists and is in the same space
@@ -231,7 +227,7 @@ public class SpaceInviteLinkServiceImpl
             INVITE_EXPIRE);
         iSpaceService.checkSeatOverLimit(dto.getSpaceId());
         // Determine whether the space has a third party enabled
-        boolean isBoundSocial = socialServiceFacade.checkSocialBind(dto.getSpaceId());
+        boolean isBoundSocial = iSpaceService.checkSocialBind(dto.getSpaceId());
         ExceptionUtil.isFalse(isBoundSocial, INVITE_EXPIRE);
         // If the user has historical members in the space, the previous member ID can be reused directly; when the user is in the space but not in the designated department, he/she joins the department
         boolean isExist = this.joinTeamIfInSpace(userId, dto.getSpaceId(), dto.getTeamId());

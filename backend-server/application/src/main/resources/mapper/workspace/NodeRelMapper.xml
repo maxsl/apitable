@@ -61,4 +61,13 @@
             </trim>
         </foreach>
     </insert>
+
+    <select id="selectRelNodeIdsByMainNodeIds" resultType="java.lang.String">
+        SELECT rel_node_id
+        FROM ${tablePrefix}node_rel
+        WHERE main_node_id IN
+        <foreach item="item" index="index" collection="mainNodeIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

@@ -332,12 +332,10 @@ public interface NodeMapper extends BaseMapper<NodeEntity> {
      * @param parentId  parent node id
      * @param preNodeId pre node id
      * @param name      node name
-     * @param  unitId   unit id
      * @return affected rows
      */
     int updateInfoByNodeId(@Param("nodeId") String nodeId, @Param("parentId") String parentId,
-                           @Param("preNodeId") String preNodeId, @Param("name") String name,
-                           @Param("unitId") Long unitId);
+                           @Param("preNodeId") String preNodeId, @Param("name") String name);
 
     /**
      * （working directory delete node/rubbish recovery node）.
@@ -681,5 +679,14 @@ public interface NodeMapper extends BaseMapper<NodeEntity> {
      * @return unit id
      */
     Long selectUnitIdByNodeId(@Param("nodeId") String nodeId);
+
+    /**
+     * update unit id.
+     *
+     * @param nodeIds node id
+     * @param unitId   unit id
+     * @return rows
+     */
+    int updateUnitIdByNodeIds(@Param("nodeIds") List<String> nodeIds, @Param("unitId") Long unitId);
 
 }

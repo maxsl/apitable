@@ -56,6 +56,8 @@ export const maxRobotActionCount = parseInt(process.env.MAX_ROBOT_ACTION_COUNT |
 // whether or not enable queue worker. auto register customers (individual instances in worker queue mode to handle messages)
 export const enableQueueWorker = Object.is(process.env.ENABLE_QUEUE_CONSUMER_WORKER, 'true');
 
+export const dbQueryBatchSize = parseInt(process.env.DB_QUERY_BATCH_SIZE || '5000', 10);
+
 export default {
   isDevMode,
   isProdMode,

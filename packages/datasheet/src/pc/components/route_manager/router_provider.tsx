@@ -177,13 +177,16 @@ const RouterProvider = ({ children }: any) => {
   const [locale, setLocale] = React.useState<Locale>();
 
   const getLocale = async (_lang) => {
-    const _locale = await import(`antd/es/locale/${_lang}`).then(module => module.default);
+    const _locale = await import(`antd/es/locale/${_lang}`).then((module) => module.default);
     setLocale(_locale);
   };
 
   useEffect(() => {
     getLocale(lang);
   }, [lang]);
+
+  // 由于设置语言，会导致子组件 mount 两次，useEffect 中如果有请求也会发生两次，微信登录在这种情况下会报错
+  if (!locale) return null;
 
   return (
     <ConfigProvider {...antdConfig} locale={locale}>

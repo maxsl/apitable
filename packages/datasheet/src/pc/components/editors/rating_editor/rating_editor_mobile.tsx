@@ -22,6 +22,7 @@ import * as React from 'react';
 import { useThemeColors } from '@apitable/components';
 import { ConfigConstant, t, Strings } from '@apitable/core';
 import { ChevronDownOutlined } from '@apitable/icons';
+import { getNodeIcon } from 'pc/components/catalog/tree/node_icon';
 import { Emoji } from 'pc/components/common/emoji';
 import { Popup } from 'pc/components/common/mobile/popup';
 import { Rate } from 'pc/components/common/rate';
@@ -43,10 +44,15 @@ const RatingEditorMobileBase: React.FC<React.PropsWithChildren<IRatingEditorMobi
   const colors = useThemeColors();
   const [visible, setVisible] = useState(false);
 
+  const emojiIcon = getNodeIcon(emoji, ConfigConstant.NodeType.DATASHEET, {
+    size: ConfigConstant.CELL_EMOJI_SIZE,
+    emojiSize: ConfigConstant.CELL_EMOJI_SIZE,
+  });
+
   return (
     <>
       <div className={classNames(style.editorContent, filtering && style.filtering)} onClick={() => setVisible(!visible)}>
-        <Rate disabled={!editable} value={value} character={<Emoji emoji={emoji} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />} max={max} />
+        <Rate disabled={!editable} value={value} character={emojiIcon} max={max} />
         {editable && <ChevronDownOutlined size={16} color={colors.fourthLevelText} />}
       </div>
       {visible && editable && (
@@ -68,7 +74,7 @@ const RatingEditorMobileBase: React.FC<React.PropsWithChildren<IRatingEditorMobi
                 value={index}
                 checked={value === index}
               >
-                <Emoji emoji={emoji} set="apple" size={ConfigConstant.CELL_EMOJI_SIZE} />
+                {emojiIcon}
               </RateItem>
             ))}
           </div>

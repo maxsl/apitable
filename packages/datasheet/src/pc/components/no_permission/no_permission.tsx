@@ -31,6 +31,8 @@ import restrictedAccessDark from 'static/icon/datasheet/restricted_access_dark.p
 import restrictedAccessLight from 'static/icon/datasheet/restricted_access_light.png';
 import { ComponentDisplay, ScreenSize } from '../common/component_display';
 import { MobileBar } from '../mobile_bar';
+// @ts-ignore
+import { ServiceQrCode } from 'enterprise/guide/ui/qr_code';
 import styles from './style.module.less';
 
 export const NoPermission: FC<React.PropsWithChildren<{ desc?: string }>> = ({ desc }) => {
@@ -65,7 +67,7 @@ export const NoPermission: FC<React.PropsWithChildren<{ desc?: string }>> = ({ d
                 <>
                   <Image src={integrateCdnHost(t(Strings.no_permission_img_url))} width={340} height={190} alt="" />
                   <div className={styles.imgContentQRcode}>
-                    {/*<ServiceQrCode />*/}
+                    <ServiceQrCode />
                   </div>
                 </>
               ) : (

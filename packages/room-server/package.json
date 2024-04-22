@@ -113,7 +113,6 @@
     "logform": "^2.2.0",
     "marked": "^4.3.0",
     "minio": "^7.0.26",
-    "moment-timezone": "^0.5.35",
     "mysql2": "^2.3.2",
     "nest-winston": "^1.8.0",
     "nestjs-i18n": "^10.4.0",
@@ -141,7 +140,8 @@
     "y-prosemirror": "^1.2.1",
     "y-protocols": "^1.0.5",
     "yjs": "^13.6.7",
-    "cron-parser": "^4.9.0"
+    "cron-parser": "^4.9.0",
+    "luxon": "^3.4.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
@@ -172,6 +172,7 @@
     "@types/sprintf-js": "^1.1.2",
     "@types/supertest": "^2.0.10",
     "@types/triple-beam": "^1.3.2",
+    "@types/luxon": "^3.4.2",
     "chai": "^4.2.0",
     "clinic": "^12.0.0",
     "eslint": "^7.21.0",

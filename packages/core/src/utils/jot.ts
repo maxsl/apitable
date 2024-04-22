@@ -232,7 +232,9 @@ export const effectResourceAction = (type: ActionType): boolean => {
   return [
     ActionType.AddField,
     ActionType.AddRecord,
+    ActionType.DelRow,
     ActionType.DelField,
+    ActionType.DelColumn,
     ActionType.DelRecord,
     ActionType.UpdateRecord,
     ActionType.UpdateField

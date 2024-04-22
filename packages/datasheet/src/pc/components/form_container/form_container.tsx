@@ -291,7 +291,7 @@ export const FormContainer: React.FC<
     return [...new Set(unitIds)];
   };
 
-  const commitRemind = (recordId: string, shareId?: string) => {
+  const commitRemind = (_recordId: string, shareId?: string) => {
     try {
       const unitIds = getRemindUnitIds();
       const unitRecs: {
@@ -309,7 +309,7 @@ export const FormContainer: React.FC<
           return isArray(value) && value.includes(unitId);
         });
         unitRecs.push({
-          recordIds: [recordId],
+          recordIds: [_recordId],
           unitIds: [unitId],
           recordTitle: getRecordName(formData[frozenFieldId], frozenField) || '',
           fieldName: fieldMap[firstMemberFieldId]?.name,
@@ -561,7 +561,7 @@ export const FormContainer: React.FC<
       const queryData = query2formData(query, fieldMap, fieldPermissionMap);
       const cacheData = validValue(formFieldContainer?.[id], fieldMap);
       setFormData({ ...cacheData, ...queryData });
-      patchRecord({ id: recordId, data: cacheData, commentCount: 0 });
+      patchRecord({ id: recordId, data: { ...cacheData, ...queryData }, commentCount: 0 });
     }
     setMount(true);
   });

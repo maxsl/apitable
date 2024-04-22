@@ -91,7 +91,12 @@ export const RecoverSpace = () => {
     if (isMobile) {
       ModalMobile.show({
         title: t(Strings.del_space_now),
-        content: t(Strings.del_space_now_tip),
+        content: (
+          <>
+            <p>{t(Strings.del_space_now_tip)}</p>
+            <p>{'For subscribers: Benefits attach to your Space. Removing it cancels those benefits. Be wary!'}</p>
+          </>
+        ),
         actions: [
           {
             text: t(Strings.cancel),
@@ -110,7 +115,12 @@ export const RecoverSpace = () => {
     }
     Modal.confirm({
       title: t(Strings.del_space_now),
-      content: t(Strings.del_space_now_tip),
+      content: (
+        <>
+          <p>{t(Strings.del_space_now_tip)}</p>
+          <p>{'For subscribers: Benefits attach to your Space. Removing it cancels those benefits. Be wary!'}</p>
+        </>
+      ),
       onOk: delNowConfirm,
       type: 'danger',
     });

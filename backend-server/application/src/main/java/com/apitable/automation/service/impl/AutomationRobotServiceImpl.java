@@ -75,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -329,7 +330,7 @@ public class AutomationRobotServiceImpl implements IAutomationRobotService {
         List<ActionVO> actions =
             Optional.of(automation.getActions()).orElse(new ArrayList<>()).stream().map(i -> {
                 ActionVO action = new ActionVO();
-                action.setInput(i.getInput());
+                action.setInput(iAutomationActionService.handleActionInput(i.getInput()));
                 action.setActionId(i.getActionId());
                 action.setPrevActionId(i.getPrevActionId());
                 action.setActionTypeId(i.getActionTypeId());
@@ -361,6 +362,7 @@ public class AutomationRobotServiceImpl implements IAutomationRobotService {
         List<String> referenceResourceIds = triggers.stream()
             .map(AutomationTriggerDto::getResourceId)
             .filter(StrUtil::isNotBlank).collect(Collectors.toList());
+        referenceResourceIds = iNodeService.getExistNodeIdsBySelf(referenceResourceIds);
         Collection<String> subtract = CollUtil.subtract(referenceResourceIds, subNodeIds);
         if (CollUtil.isEmpty(subtract)) {
             return;
@@ -448,6 +450,16 @@ public class AutomationRobotServiceImpl implements IAutomationRobotService {
     public void checkRobotExists(String robotId) {
         ExceptionUtil.isTrue(SqlHelper.retBool(robotMapper.selectCountByRobotId(robotId)),
             AUTOMATION_ROBOT_NOT_EXIST);
+    }
+
+    @Override
+    public boolean linkByOutsideAutomation(List<String> nodeIds) {
+        List<String> robotIds = iAutomationTriggerService.getRobotIdsByResourceIds(nodeIds);
+        if (CollUtil.isNotEmpty(robotIds)) {
+            List<String> resourceIds = robotMapper.selectResourceIdsByRobotIds(robotIds);
+            return !new HashSet<>(nodeIds).containsAll(resourceIds);
+        }
+        return false;
     }
 
     @Override

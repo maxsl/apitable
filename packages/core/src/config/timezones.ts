@@ -200,9 +200,10 @@ export const TIMEZONES = [
     value: 'Central Standard Time',
     abbr: 'CDT',
     offset: -5,
-    // isdst: true,
+    isdst: true,
     text: '(UTC-06:00) Central Time (US & Canada)',
     utc: [
+      'America/Chicago',
       'America/Indiana/Knox',
       'America/Indiana/Tell_City',
       'America/Matamoros',
@@ -1033,14 +1034,6 @@ export const TIMEZONES = [
     isdst: false,
     text: '(UTC+08:00) Irkutsk',
     utc: ['Asia/Irkutsk'],
-  },
-  {
-    value: 'Central Standard Time',
-    abbr: 'CDT',
-    offset: 8,
-    isdst: false,
-    text: '(UTC-06:00) Central Time (US & Canada)',
-    utc: ['America/Chicago'],
   },
   {
     value: 'Japan Standard Time',
