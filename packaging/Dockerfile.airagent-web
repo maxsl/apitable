@@ -1,7 +1,7 @@
 # Install dependencies only when needed
 FROM apitable/nodepy:16.15.0-alpine AS deps
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8.15.7
 
 WORKDIR /workspace-install
 
@@ -29,7 +29,7 @@ ARG NEXT_ASSET_PREFIX=""
 ARG NEXT_PUBLIC_ASSET_PREFIX=""
 ENV SEMVER_FULL=${SEMVER_FULL}
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8.15.7
 
 WORKDIR /app
 
