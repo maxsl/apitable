@@ -6,6 +6,7 @@ RUN npm install -g pnpm@8.15.7
 WORKDIR /workspace-install
 
 COPY ./pnpm-workspace.yaml ./package.json ./pnpm-lock.yaml ./
+COPY ./patches/ ./patches
 
 # datasheet dependencies packages
 COPY packages/components/package.json ./packages/components/
@@ -39,6 +40,7 @@ COPY ./pnpm-workspace.yaml ./build.js ./package.json ./pnpm-lock.yaml ./nx.json 
 COPY packages/ ./packages/
 
 COPY --from=deps /workspace-install/node_modules ./node_modules
+COPY --from=deps /app/patches ./patches
 COPY --from=deps /workspace-install/packages/datasheet/node_modules ./packages/datasheet/node_modules
 COPY --from=deps /workspace-install/packages/components/node_modules ./packages/components/node_modules
 COPY --from=deps /workspace-install/packages/core/node_modules ./packages/core/node_modules
