@@ -135,7 +135,8 @@
     },
     "patchedDependencies": {
       "mysql2@2.3.3": "patches/mysql2@2.3.3.patch"
-    }
+    },
+    "allowNonAppliedPatches": true
   },
   "dependencies": {
     "glob-parent": "5.1.2",
