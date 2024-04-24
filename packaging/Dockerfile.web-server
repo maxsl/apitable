@@ -21,7 +21,7 @@ COPY packages/api-client/package.json ./packages/api-client/
 # datasheet main
 COPY packages/datasheet/package.json ./packages/datasheet/
 
-RUN pnpm install
+RUN pnpm install --filter mysql2@2.3.3
 
 # stage builder
 FROM apitable/nodepy:16.15.0-alpine AS builder
