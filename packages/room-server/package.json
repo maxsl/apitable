@@ -113,7 +113,7 @@
     "logform": "^2.2.0",
     "marked": "^4.3.0",
     "minio": "^7.0.26",
-    "mysql2": "^2.3.2",
+    "mysql2": "^3.9.7",
     "nest-winston": "^1.8.0",
     "nestjs-i18n": "^10.4.0",
     "nestjs-proto-gen-ts": "^1.0.19",

@@ -451,13 +451,16 @@ export const getNodeViewWithoutFilterInfo = (snapshot: ISnapshot, viewId: string
   if (!temporaryView || mirror?.sourceInfo.datasheetId !== snapshot.datasheetId) {
     return originView;
   }
+  if (!originView) {
+    return;
+  }
   // If any view configuration is modified in the mirror,
   // the view configuration operation of the original table will not affect the mirror anymore,
   // so the cached data of the mirror is taken directly here.
   return {
-    id: originView!.id,
-    type: originView!.type,
-    rows: originView!.rows,
+    id: originView.id,
+    type: originView.type,
+    rows: originView.rows,
     ...temporaryView,
     filterInfo: originView?.filterInfo,
   } as IViewProperty;

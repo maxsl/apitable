@@ -64,7 +64,9 @@ interface IGalleryCardBodyProps {
 const SINGLE_TEXT_TYPE = [FieldType.Formula, FieldType.Number, FieldType.Currency, FieldType.Percent, FieldType.DateTime, FieldType.Button];
 
 export const CardBody: React.FC<React.PropsWithChildren<IGalleryCardBodyProps>> = (props) => {
-  const { visibleFields, recordId, showEmptyField, multiTextMaxLine, isColNameVisible, className, isVirtual, isGallery, datasheetId } = props;
+  const {
+    visibleFields, recordId, showEmptyField, multiTextMaxLine, isColNameVisible, className, isVirtual, isGallery, datasheetId
+  } = props;
   const recordSnapshot = useAppSelector((state) => Selectors.getRecordSnapshot(state, datasheetId, recordId), shallowEqual);
   const { screenIsAtMost } = useResponsive();
   const isMobile = screenIsAtMost(ScreenSize.md);
@@ -80,7 +82,6 @@ export const CardBody: React.FC<React.PropsWithChildren<IGalleryCardBodyProps>> 
         [styles.virtualGallery!]: isGallery,
         [styles.colName!]: isColNameVisible,
       })}
-      style={{ background: colors.defaultBg }}
     >
       {visibleFields.map((item, index) => {
         const cellValue = Selectors.getCellValue(store.getState(), recordSnapshot, recordId, item.fieldId);

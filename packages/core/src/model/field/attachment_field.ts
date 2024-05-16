@@ -36,7 +36,7 @@ const baseAttachmentFieldSchema = {
   name: Joi.string().required(),
   mimeType: Joi.string().required(),
   token: Joi.string().required(),
-  bucket: Joi.string().required(),
+  bucket: Joi.string(),
   size: Joi.number().required(),
   width: Joi.number(),
   height: Joi.number(),

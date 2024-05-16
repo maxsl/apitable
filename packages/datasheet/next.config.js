@@ -38,7 +38,7 @@ const sentryWebpackPluginOptions = {
   release: process.env.WEB_CLIENT_VERSION ?? '',
   silent: false, // Suppresses all logs
   hideSourceMaps: true,
-  debug: true
+  debug: false
 
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
@@ -120,4 +120,4 @@ const plugins = [
 ];
 
 const config = () => plugins.reduce((acc, next) => next(acc), nextConfig);
-module.exports = isProd ? withSentryConfig(config, sentryWebpackPluginOptions, sentryWebpackPluginOptions) : config;
+module.exports = isProd && process.env.SENTRY_AUTH_TOKEN_VIKA ? withSentryConfig(config, sentryWebpackPluginOptions, sentryWebpackPluginOptions) : config;

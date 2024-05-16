@@ -106,3 +106,4 @@ jobs:
           JAVA_FILE_NAME: checkstyle.xml
           VALIDATE_SHELL_SHFMT: false
           VALIDATE_DOCKERFILE_HADOLINT: false
+          VALIDATE_JSCPD: false

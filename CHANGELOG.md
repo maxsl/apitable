@@ -1,5 +1,23 @@
 # APITable CHANGELOG
 
+## [v1.10.0-beta.3](https://github.com/apitable/apitable/releases/tag/v1.10.0-beta.3) (2024-05-06)
+
+
+### What's more
+
+* sync: hosted cloud ([#1734](https://github.com/apitable/apitable/pull/1734)) @zoe-icu 
+* refactor: add changelog ([#1721](https://github.com/apitable/apitable/pull/1721)) @zoe-icu 
+* chore: upgrade mysql2 ([#11084](https://github.com/apitable/apitable/pull/1734/commits/d299e369b8047f577e915adfe3b627317af3028c)) @zoe-icu 
+## [v1.10.0-beta.2](https://github.com/apitable/apitable/releases/tag/v1.10.0-beta.2) (2024-04-17)
+
+
+### Bug fixes
+
+* fix: delete automation trigger ([#1657](https://github.com/apitable/apitable/pull/1657)) @zoe-icu 
+
+### What's more
+
+* sync: hosted cloud ([#1720](https://github.com/apitable/apitable/pull/1720)) @zoe-icu 
 ## [v1.10.0-beta](https://github.com/apitable/apitable/releases/tag/v1.10.0-beta) (2024-03-11)
 
 

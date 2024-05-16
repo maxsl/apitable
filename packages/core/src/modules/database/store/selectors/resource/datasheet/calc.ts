@@ -240,12 +240,15 @@ export const getTemporaryView = (snapshot: ISnapshot | undefined, viewId: string
   if (!temporaryView || mirror?.sourceInfo.datasheetId !== snapshot.datasheetId) {
     return originView;
   }
+  if (!originView) {
+    return;
+  }
   // in mirror, if any view config is modified,
   // the original table's view config will not affect the mirror, so here directly use the mirror's cache data
   return {
-    id: originView!.id,
-    type: originView!.type,
-    rows: originView!.rows,
+    id: originView.id,
+    type: originView.type,
+    rows: originView.rows,
     ...temporaryView,
   } as IViewProperty;
 };

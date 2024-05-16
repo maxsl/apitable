@@ -30,17 +30,9 @@ export const getTimeZone = () => {
   return isValidTimezone(timeZone) ? timeZone : '';
 };
 
-const isDst = (abbr?: string) => {
-  if (!abbr) {
-    return false;
-  }
-  const dstAbbrs = ['PST', 'PDT'];
-  return dstAbbrs.includes(abbr);
-};
-
 export const getTimeZoneOffsetByUtc = (utc: string, isdstDate?: boolean) => {
   const currentTimeZoneData = TIMEZONES.find((tz) => tz.utc.includes(utc));
-  const dstDiff = isdstDate && isDst(currentTimeZoneData?.abbr) ? 1 : 0;
+  const dstDiff = currentTimeZoneData?.isdst ? isdstDate ? 0 : -1 : 0;
   return currentTimeZoneData ? currentTimeZoneData.offset + dstDiff : 0;
 };
 

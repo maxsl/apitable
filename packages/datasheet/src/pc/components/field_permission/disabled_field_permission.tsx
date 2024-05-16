@@ -32,7 +32,7 @@ export const DisabledFieldPermission: React.FC<React.PropsWithChildren<IDisabled
   const { setPermissionStatus, field } = props;
   const datasheetId = useAppSelector((state) => state.pageParams.datasheetId)!;
   const views = useAppSelector(Selectors.getViewsList);
-  const spaceInfo = useAppSelector((state) => state.space.curSpaceInfo)!;
+  const spaceInfo = useAppSelector((state) => state.space.curSpaceInfo);
 
   const openFieldPermission = async () => {
     const res = await DatasheetApi.setFieldPermissionStatus(datasheetId, field.id, true);
@@ -44,7 +44,9 @@ export const DisabledFieldPermission: React.FC<React.PropsWithChildren<IDisabled
       });
       return;
     }
-    triggerUsageAlert('fieldPermissionNums', { usage: spaceInfo.fieldRoleNums + 1 });
+    if (spaceInfo) {
+      triggerUsageAlert('fieldPermissionNums', { usage: spaceInfo.fieldRoleNums + 1 });
+    }
     setPermissionStatus(true);
   };
 

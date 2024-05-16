@@ -261,7 +261,7 @@ export class SingleSelectField extends SelectField {
     options: Joi.array().items(Joi.object({
       id: Joi.string(),
       name: Joi.string().required(),
-      color: Joi.number(),
+      color: Joi.alternatives(Joi.number(), Joi.string())
     })).required(),
     defaultValue: Joi.string()
   }).required();

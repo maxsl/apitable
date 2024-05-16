@@ -22,10 +22,10 @@
 import { RewriteFrames } from '@sentry/integrations';
 import * as Sentry from '@sentry/nextjs';
 import { Integrations } from '@sentry/tracing';
+import { handleResponse, initAxios } from 'api/utils/init_axios';
 import dayjs from 'dayjs';
 import { getLanguage, injectStore, WasmApi } from '@apitable/core';
 import { getBrowserDatabusApiEnabled } from '@apitable/core/dist/modules/database/api/wasm';
-import { handleResponse, initAxios } from 'api/utils/init_axios';
 import { getEnvVariables, getInitializationData, getReleaseVersion } from 'pc/utils/env';
 import '../../modules/shared/apphook/hook_bindings';
 import { APITable } from '../../modules/shared/apitable_lib';
@@ -74,6 +74,7 @@ function initBugTracker() {
     ignoreErrors: [
       // It was found that all hovers where tooltip appears send a request to sentry and the exception status is this
       'ResizeObserver loop limit exceeded',
+      'JSON Parse error: Unexpected EOF',
     ],
   });
 }

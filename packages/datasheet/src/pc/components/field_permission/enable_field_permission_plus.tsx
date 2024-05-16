@@ -17,10 +17,10 @@
  */
 
 import { useMount, useToggle } from 'ahooks';
+import { TriggerCommands } from 'modules/shared/apphook/trigger_commands';
 import { useEffect, useState } from 'react';
 import { Box, IOption, Skeleton, Switch } from '@apitable/components';
 import { ConfigConstant, DatasheetApi, IFieldPermissionRole, IUnitValue, MemberType, Selectors, StoreActions, Strings, t } from '@apitable/core';
-import { TriggerCommands } from 'modules/shared/apphook/trigger_commands';
 import { MembersDetail } from 'pc/components/catalog/permission_settings_plus/permission/members_detail';
 import { UnitItem } from 'pc/components/catalog/permission_settings_plus/permission/unit_item';
 import { Message } from 'pc/components/common/message/message';
@@ -47,8 +47,8 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
   const fieldPermission = useAppSelector(Selectors.getFieldPermissionMap)!;
   const readonly = fieldPermission[field.id] && !fieldPermission[field.id].manageable;
   const [enabledFieldPermission, setEnabledFieldPermission] = useState<boolean>();
-  const spaceInfo = useAppSelector((state) => state.space.curSpaceInfo)!;
-  const spaceId = useAppSelector((state) => state.space.activeId)!;
+  const spaceInfo = useAppSelector((state) => state.space.curSpaceInfo);
+  const spaceId = useAppSelector((state) => state.space.activeId);
 
   const [memberList, setMemberList] = useState<IMemberList[]>([]);
   const [pageNo, setPageNo] = useState<number>(1);
@@ -108,9 +108,11 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
     if (enabledFieldPermission) {
       return true;
     }
-    const result = triggerUsageAlert('fieldPermissionNums', { usage: spaceInfo.fieldRoleNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
-    if (result) {
-      return false;
+    if (spaceInfo) {
+      const result = triggerUsageAlert('fieldPermissionNums', { usage: spaceInfo.fieldRoleNums + 1, alwaysAlert: true }, SubscribeUsageTipType.Alert);
+      if (result) {
+        return false;
+      }
     }
 
     const res = await DatasheetApi.setFieldPermissionStatus(datasheetId, field.id, true, true);
@@ -122,7 +124,9 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
       });
       return false;
     }
-    dispatch(StoreActions.getSpaceInfo(spaceId, true));
+    if (spaceId) {
+      dispatch(StoreActions.getSpaceInfo(spaceId, true));
+    }
     return true;
   };
 
@@ -247,7 +251,9 @@ export const EnableFieldPermissionPlus: React.FC<React.PropsWithChildren<IEnable
       handleErrMsg(message);
       return;
     }
-    dispatch(StoreActions.getSpaceInfo(spaceId, true));
+    if (spaceId) {
+      dispatch(StoreActions.getSpaceInfo(spaceId, true));
+    }
     fetchRoleList();
   };
 

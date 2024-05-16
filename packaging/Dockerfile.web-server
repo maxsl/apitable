@@ -1,11 +1,12 @@
 # Install dependencies only when needed
 FROM apitable/nodepy:16.15.0-alpine AS deps
 
-RUN npm install -g pnpm@8.15.7
+RUN npm install -g pnpm@8.13.1
 
 WORKDIR /workspace-install
 
 COPY ./pnpm-workspace.yaml ./package.json ./pnpm-lock.yaml ./
+COPY ./patches/ ./patches
 
 # datasheet dependencies packages
 COPY packages/components/package.json ./packages/components/
@@ -21,7 +22,7 @@ COPY packages/api-client/package.json ./packages/api-client/
 # datasheet main
 COPY packages/datasheet/package.json ./packages/datasheet/
 
-RUN pnpm install --filter mysql2@2.3.3
+RUN pnpm install
 
 # stage builder
 FROM apitable/nodepy:16.15.0-alpine AS builder
@@ -31,13 +32,14 @@ ARG NEXT_ASSET_PREFIX=""
 ARG NEXT_PUBLIC_ASSET_PREFIX=""
 ENV SEMVER_FULL=${SEMVER_FULL}
 
-RUN npm install -g pnpm@8.15.7
+RUN npm install -g pnpm@8.13.1
 
 WORKDIR /app
 
 COPY ./pnpm-workspace.yaml ./build.js ./package.json ./pnpm-lock.yaml ./nx.json ./common-tsconfig.json ./tsconfig.json ./.eslintrc ./
 COPY packages/ ./packages/
 
+COPY --from=deps /workspace-install/patches ./patches
 COPY --from=deps /workspace-install/node_modules ./node_modules
 COPY --from=deps /workspace-install/packages/datasheet/node_modules ./packages/datasheet/node_modules
 COPY --from=deps /workspace-install/packages/components/node_modules ./packages/components/node_modules

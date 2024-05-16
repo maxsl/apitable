@@ -108,7 +108,7 @@ const writeOpenPropertyDelete: IUpdateOpenMultiSelectFieldProperty = {
   options: [{
     id: 'opt000',
     name: 'Test Label 1',
-    color: 1
+    color: getFieldOptionColor(1).name
   }]
 };
 
@@ -116,11 +116,11 @@ const writeOpenProperty: IUpdateOpenMultiSelectFieldProperty = {
   options: [{
     id: 'opt000',
     name: 'Test Label 1',
-    color: 1
+    color: getFieldOptionColor(1).name
   }, {
     id: 'opt001',
     name: 'Test Label 2',
-    color: 2
+    color: getFieldOptionColor(2).name
   }]
 };
 

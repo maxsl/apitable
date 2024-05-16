@@ -1,11 +1,12 @@
 # Install dependencies only when needed
 FROM apitable/nodepy:16.15.0-alpine AS deps
 
-RUN npm install -g pnpm@8.15.7
+RUN npm install -g pnpm@8.13.1
 
 WORKDIR /workspace-install
 
 COPY ./pnpm-workspace.yaml ./package.json ./pnpm-lock.yaml ./
+COPY ./patches/ ./patches
 
 # air-agent dependencies packages
 COPY packages/components/package.json ./packages/components/
@@ -29,7 +30,7 @@ ARG NEXT_ASSET_PREFIX=""
 ARG NEXT_PUBLIC_ASSET_PREFIX=""
 ENV SEMVER_FULL=${SEMVER_FULL}
 
-RUN npm install -g pnpm@8.15.7
+RUN npm install -g pnpm@8.13.1
 
 WORKDIR /app
 
